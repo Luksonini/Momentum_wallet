@@ -1,0 +1,159 @@
+{% extends "user_portfolio/layout.html" %}
+
+{% block body %}
+    <div class="w-full max-w-md mx-auto my-8 flex flex-col items-center">
+        <div>
+            <p>Your current strategy parameters:</p>
+            <p>Currently you are searching for the top {{ user_preferences.nlargest_window }} 
+                stock performance in the past {{ user_preferences.window }} 
+                months starting from 
+                <span id="user-preferences-start-date">{{ user_preferences.start_date}}</span>:</p>
+        </div>
+       
+       
+        {% comment %} <form id="strategy-form" method="post" class="">
+            {% csrf_token %}
+            {{ strategy_form.start_date }}
+            <button type="submit">Submit</button>
+        </form> {% endcomment %}
+        <form id="strategy-form" method="post" class="">
+            {% csrf_token %}
+            <input type="date" id="start-date-input" name="start_date" value="{{ user_preferences.start_date|date:'Y-m-d' }}" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div class="w-full max-w-md mx-auto my-8 flex items-center justify-center">
+        <form method="post" class="">
+            {% csrf_token %}
+            {{ optimisation_form.start_date }}
+            {{ optimisation_form.window }}
+            {{ optimisation_form.nlargest_window }}
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div id="loading-spinner" role="status">
+        <div role="status">
+            <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+            </svg>
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <div id="chart-container" class="w-full max-w-4xl mx-auto mt-8 mb-4">
+        <canvas id="myChart" class="w-full h-64"></canvas>
+    </div>
+
+
+<script>
+    // Przygotuj zmienną na wykres, aby była dostępna globalnie
+    var myChart; 
+
+    // Funkcja aktualizująca wykres
+    function updateChart(chartData) {
+        // Usuń istniejący wykres, jeśli istnieje
+        if (myChart) {
+            myChart.destroy();
+        }
+    
+        // Stwórz nowy wykres z nowymi danymi
+        var ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map(function(item) { return item.date; }),
+                datasets: [{
+                    label: 'US500 Returns',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: chartData.map(function(item) { return item.US500_returns; }),
+                    fill: false,
+                }, {
+                    label: 'Strategy',
+                    backgroundColor: 'rgb(54, 162, 235)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    data: chartData.map(function(item) { return item.strategy; }),
+                    fill: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Performance Comparison'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    x: { // 'xAxes' zmienione na 'x'
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Date'
+                        }
+                    },
+                    y: { // 'yAxes' zmienione na 'y'
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Return'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+// Funkcja pobierająca dane wykresu
+function fetchChartData(startDate) {
+    document.getElementById('loading-spinner').style.display = 'block';
+    document.getElementById('chart-container').style.display = 'none';
+
+    
+    // Użyj zmiennej `startDate` jako części URL w żądaniu GET
+    fetch('/chart-data/?start_date=' + startDate)
+        .then(response => response.json())
+        .then(data => {
+            updateChart(data);
+            document.getElementById('user-preferences-start-date').textContent = startDate;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('chart-container').style.display = 'block';
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Dodaj obsługę zdarzenia submit do formularza
+    document.getElementById('loading-spinner').style.display = 'none';
+    document.getElementById('strategy-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Zapobiega domyślnemu zachowaniu formularza
+        var startDate = document.getElementById('start-date-input').value;
+        fetchChartData(startDate); // Przekazujemy wybraną datę do funkcji fetchChartData
+    });
+
+    // Ładowanie wykresu z domyślnymi danymi
+    var defaultData = {{ chart_data | safe }};
+    if (defaultData && defaultData.length > 0) {
+        updateChart(defaultData);
+    } else {
+        // Jeśli nie ma domyślnych danych, możesz zdecydować o pobraniu nowych danych
+        fetchChartData(''); // Możesz przekazać pusty ciąg jako domyślną datę
+    }
+});
+</script>
+
+{% endblock %}
+
+
