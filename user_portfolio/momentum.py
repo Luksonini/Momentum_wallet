@@ -124,29 +124,33 @@ class MarketAnalysis:
 
         # Nowa metoda do optymalizacji
     def optimize_parameters(self, window_range, nlargest_range, step=1):
-            """
-            Optymalizuje parametry window i nlargest_window.
-            
-            :param window_range: krotka (min, max) dla window
-            :param nlargest_range: krotka (min, max) dla nlargest_window
-            :param step: krok przeszukiwania
-            :return: najlepsze znalezione parametry
-            """
-            
-            def objective(params):
-                self.window, self.nlargest_window = int(params[0]), int(params[1])
-                self.rolling_returns_large = self.calculate_rolling_returns(self.monthly_returns, self.window)
-                returns = []
-                for date in self.monthly_returns.index[:-1]:
-                    try:
-                        returns.append(self.portfolio_performance(date))
-                    except KeyError:
-                        returns.append(0)
-                cumulative_performance = np.exp(np.sum(np.log1p(returns)))
-                return -cumulative_performance  # minus, ponieważ brute szuka minimum
+        """
+        Optymalizuje parametry window i nlargest_window.
 
-            ranges = (slice(window_range[0], window_range[1], step), slice(nlargest_range[0], nlargest_range[1], step))
-            
-            result = brute(objective, ranges, full_output=True, finish=None)
-            return result[0], -result[1]
+        :param window_range: krotka (min, max) dla window
+        :param nlargest_range: krotka (min, max) dla nlargest_window
+        :param step: krok przeszukiwania
+        :return: najlepsze znalezione parametry
+        """
+        
+        def objective(params):
+            self.window, self.nlargest_window = int(params[0]), int(params[1])
+            self.rolling_returns_large = self.calculate_rolling_returns(self.monthly_returns, self.window)
+            returns = []
+            for date in self.monthly_returns.index[:-1]:
+                try:
+                    performance = self.portfolio_performance(date)
+                    if np.isnan(performance):
+                        performance = 0  # Zastąpienie NaN zerem
+                    returns.append(performance)
+                except KeyError:
+                    returns.append(0)
+            cumulative_performance = np.exp(np.sum(np.log1p(returns)))
+            return -cumulative_performance  # minus, ponieważ brute szuka minimum
+
+        ranges = (slice(window_range[0], window_range[1], step), slice(nlargest_range[0], nlargest_range[1], step))
+        
+        result = brute(objective, ranges, full_output=True, finish=None)
+        return result[0], -result[1]
+
 

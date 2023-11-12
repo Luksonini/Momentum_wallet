@@ -1,31 +1,27 @@
 {% extends "user_portfolio/layout.html" %}
-
+{% load static %}
 {% block body %}
     <div class="w-full max-w-md mx-auto my-8 flex flex-col items-center">
         <div>
             <p>Your current strategy parameters:</p>
-            <p>Currently you are searching for the top {{ user_preferences.nlargest_window }} 
-                stock performance in the past {{ user_preferences.window }} 
+            <p>Currently you are searching for the top <span id="user-preferences-nlargest">{{ user_preferences.nlargest_window }}</span> 
+                stock performance in the past <span id="user-preferences-window">{{ user_preferences.window }}</span> 
                 months starting from 
                 <span id="user-preferences-start-date">{{ user_preferences.start_date}}</span>:</p>
         </div>
        
        
-        {% comment %} <form id="strategy-form" method="post" class="">
+        <form id="strategy-form" method="post" class="">
             {% csrf_token %}
             {{ strategy_form.start_date }}
             <button type="submit">Submit</button>
-        </form> {% endcomment %}
-        <form id="strategy-form" method="post" class="">
-            {% csrf_token %}
-            <input type="date" id="start-date-input" name="start_date" value="{{ user_preferences.start_date|date:'Y-m-d' }}" required>
-            <button type="submit">Submit</button>
-        </form>
+        </form> 
+
     </div>
     <div class="w-full max-w-md mx-auto my-8 flex items-center justify-center">
-        <form method="post" class="">
+        <form method="post" id="optimisation-form" class="">
             {% csrf_token %}
-            {{ optimisation_form.start_date }}
+            {{ optimisation_form.optimisation_date }}
             {{ optimisation_form.window }}
             {{ optimisation_form.nlargest_window }}
             <button type="submit">Submit</button>
@@ -47,113 +43,19 @@
 
 
 <script>
-    // Przygotuj zmienną na wykres, aby była dostępna globalnie
-    var myChart; 
-
-    // Funkcja aktualizująca wykres
-    function updateChart(chartData) {
-        // Usuń istniejący wykres, jeśli istnieje
-        if (myChart) {
-            myChart.destroy();
-        }
-    
-        // Stwórz nowy wykres z nowymi danymi
-        var ctx = document.getElementById('myChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartData.map(function(item) { return item.date; }),
-                datasets: [{
-                    label: 'US500 Returns',
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: chartData.map(function(item) { return item.US500_returns; }),
-                    fill: false,
-                }, {
-                    label: 'Strategy',
-                    backgroundColor: 'rgb(54, 162, 235)',
-                    borderColor: 'rgb(54, 162, 235)',
-                    data: chartData.map(function(item) { return item.strategy; }),
-                    fill: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                title: {
-                    display: true,
-                    text: 'Performance Comparison'
-                },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                hover: {
-                    mode: 'nearest',
-                    intersect: true
-                },
-                scales: {
-                    x: { // 'xAxes' zmienione na 'x'
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Date'
-                        }
-                    },
-                    y: { // 'yAxes' zmienione na 'y'
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Return'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-
-// Funkcja pobierająca dane wykresu
-function fetchChartData(startDate) {
-    document.getElementById('loading-spinner').style.display = 'block';
-    document.getElementById('chart-container').style.display = 'none';
-
-    
-    // Użyj zmiennej `startDate` jako części URL w żądaniu GET
-    fetch('/chart-data/?start_date=' + startDate)
-        .then(response => response.json())
-        .then(data => {
-            updateChart(data);
-            document.getElementById('user-preferences-start-date').textContent = startDate;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        })
-        .finally(() => {
-            document.getElementById('loading-spinner').style.display = 'none';
-            document.getElementById('chart-container').style.display = 'block';
-        });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Dodaj obsługę zdarzenia submit do formularza
-    document.getElementById('loading-spinner').style.display = 'none';
-    document.getElementById('strategy-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Zapobiega domyślnemu zachowaniu formularza
-        var startDate = document.getElementById('start-date-input').value;
-        fetchChartData(startDate); // Przekazujemy wybraną datę do funkcji fetchChartData
-    });
-
-    // Ładowanie wykresu z domyślnymi danymi
+    // Przekazanie danych Django do JavaScript
     var defaultData = {{ chart_data | safe }};
-    if (defaultData && defaultData.length > 0) {
-        updateChart(defaultData);
-    } else {
-        // Jeśli nie ma domyślnych danych, możesz zdecydować o pobraniu nowych danych
-        fetchChartData(''); // Możesz przekazać pusty ciąg jako domyślną datę
-    }
-});
+
+    // Uruchomienie kodu po załadowaniu DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicjalizacja wykresu z domyślnymi danymi
+        if (defaultData && defaultData.length > 0) {
+            updateChart(defaultData);
+        } else {
+            // Jeśli nie ma domyślnych danych, możesz zdecydować o pobraniu nowych danych
+            fetchChartData(''); // Możesz przekazać pusty ciąg jako domyślną datę
+        }
+    });
 </script>
-
+<script src="{% static 'user_portfolio/js/main.js' %}"></script>
 {% endblock %}
-
-
