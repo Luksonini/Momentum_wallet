@@ -7,12 +7,14 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import StrategyInputForm, OptimisationPreferencesForm
 from .models import User, UserStrategyModel, MarketAnalysisPreferences
-from .momentum import MarketAnalysis
+from .utils.momentum import MarketAnalysis
+from .utils.calculate_weights import EqualWeightedPortfolio
 from django.http import JsonResponse
 import json
 from datetime import datetime
 from django.core.serializers.json import DjangoJSONEncoder
-
+# user_portfolio\utils
+# user_portfolio\views.py
 
 @login_required(login_url='login')
 def index(request):
@@ -36,6 +38,7 @@ def index(request):
 @login_required(login_url='login')
 def chart_data(request):
     start_date_str = request.GET.get('start_date', None)
+    print(f"to jest startdate {start_date_str}")
     start_date = datetime.strptime(str(start_date_str), '%Y-%m-%d').date()
 
     user_preferences = MarketAnalysisPreferences.objects.get(user=request.user)
@@ -48,54 +51,30 @@ def chart_data(request):
     )
 
     results_json = market_analysis.strategy_results()
-    data, created = UserStrategyModel.objects.update_or_create(user=request.user, defaults={'data': results_json})
-    data.save() 
+    tickers = market_analysis.get_current_month_tickers()
 
-    response = JsonResponse(results_json, encoder=DjangoJSONEncoder, safe=False)
+    # strategy_instance, created = 
+    UserStrategyModel.objects.update_or_create(
+        user=request.user, defaults={'data': results_json, 'current_tickers' : tickers})
+    # strategy_instance.save() 
 
-    # Dodaj nagłówki zapobiegające buforowaniu
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response['Pragma'] = 'no-cache'
-    response['Expires'] = '0'
+    response_data = {
+        'results': results_json,
+        'piechart_data': tickers,
+    }
 
-    return response
+    # response = JsonResponse(results_json, encoder=DjangoJSONEncoder, safe=False)
 
-# def optimisation_view(request):
-#         # Pobierz wartości z parametrów zapytania
-#     start_date = request.GET.get('optimisation_date')
-#     max_window = request.GET.get('window')
-#     max_nlargest = request.GET.get('nlargest_window')
-#     market_analysis = MarketAnalysis(start_date=start_date)
-#     optimal_params = market_analysis.optimize_parameters(window_range=(1, int(max_window) + 1), nlargest_range=(3, int(max_nlargest) + 1))
-#     # Zaktualizuj instancję optymalnymi parametrami
-#     new_window = int(optimal_params[0][0])
-#     new_nlargest_window = int(optimal_params[0][1])
+    return JsonResponse(response_data)
 
-#     market_analysis.window = new_window
-#     market_analysis.nlargest_window = new_nlargest_window
-#     market_analysis.rolling_returns_large = market_analysis.calculate_rolling_returns(market_analysis.monthly_returns, market_analysis.window)
-#     # Wywołaj metodę strategy_results dla optymalizowanej strategii
-#     user_preferences = MarketAnalysisPreferences.objects.get(user=request.user)
-#     user_preferences.start_date = datetime.strptime(str(start_date), '%Y-%m-%d').date()
-#     user_preferences.window = new_window
-#     user_preferences.nlargest_window = new_nlargest_window
-#     user_preferences.save()
-
-#     results_json = market_analysis.strategy_results()
-#     data, created = UserStrategyModel.objects.update_or_create(user=request.user, defaults={'data': results_json})
-#     data.save() 
-#     response = JsonResponse(results_json, encoder=DjangoJSONEncoder, safe=False)
-#     return response
-
-
-
+@login_required(login_url='login')
 def optimisation_view(request):
     # Pobierz wartości z parametrów zapytania
     start_date = request.GET.get('optimisation_date')
     max_window = request.GET.get('window')
     max_nlargest = request.GET.get('nlargest_window')
     market_analysis = MarketAnalysis(start_date=start_date)
-    optimal_params = market_analysis.optimize_parameters(window_range=(1, int(max_window) + 1), nlargest_range=(3, int(max_nlargest) + 1))
+    optimal_params = market_analysis.optimize_parameters(window_range=(1, int(max_window) + 1), nlargest_range=(5, int(max_nlargest) + 1))
 
     # Zaktualizuj instancję optymalnymi parametrami
     new_window = int(optimal_params[0][0])
@@ -113,16 +92,22 @@ def optimisation_view(request):
 
     # Wywołaj metodę strategy_results dla optymalizowanej strategii
     results_json = market_analysis.strategy_results()
-    data, created = UserStrategyModel.objects.update_or_create(user=request.user, defaults={'data': results_json})
-    data.save() 
+    tickers = market_analysis.get_current_month_tickers()
+    equally_portfolio = EqualWeightedPortfolio(tickers, total_amount=1000)
+    equally_portfolio_data = equally_portfolio.get_chart_data()
 
+    # data, created = 
+    UserStrategyModel.objects.update_or_create(user=request.user, defaults={'data': results_json, 'current_tickers': tickers})
+    # data.save() 
+    print(equally_portfolio_data)
     # Dodaj nowe parametry do wyników
     response_data = {
         'results': results_json,
         'new_window': new_window,
-        'new_nlargest_window': new_nlargest_window
+        'new_nlargest_window': new_nlargest_window,
+        'piechart_data': tickers,
+        'equally_portfolio_data' : equally_portfolio_data
     }
-    print(response_data)
 
     return JsonResponse(response_data, encoder=DjangoJSONEncoder, safe=False)
 

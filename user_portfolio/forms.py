@@ -14,11 +14,11 @@ class StrategyInputForm(forms.Form):
 class OptimisationPreferencesForm(forms.ModelForm):
     optimisation_date = forms.DateField(widget=CustomDateInput(attrs={'type': 'date', 'id': 'optimisation-date-input', 'name': 'optimisation_date'}))
     window = forms.IntegerField(
-        min_value=1, max_value=12, initial=8,
+        min_value=1, max_value=15, initial=8,
         widget=forms.NumberInput(attrs={'id': 'window-input', 'name': 'window'})
     )
     nlargest_window = forms.IntegerField(
-        min_value=4, max_value=10, initial=10,
+        min_value=5, max_value=10, initial=10,
         widget=forms.NumberInput(attrs={'id': 'nlargest-window-input', 'name': 'nlargest_window'})
     )
 

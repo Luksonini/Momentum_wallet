@@ -1,5 +1,6 @@
 // Przygotuj zmienną na wykres, aby była dostępna globalnie
-var myChart; 
+var myChart;
+var myPieChart; 
 
 // Funkcja aktualizująca wykres
     // Funkcja aktualizująca wykres
@@ -63,6 +64,40 @@ var myChart;
         });
     }
 
+
+
+// Funkcja aktualizująca wykres kołowy
+function updatePieChart(pieChartData) {
+    // Usuń istniejący wykres kołowy, jeśli istnieje
+    if (myPieChart) {
+        myPieChart.destroy();
+    }
+    // const samplePieChartData = {
+    //     labels: ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
+    //     data: [10, 20, 30, 40, 50]
+    // };
+    
+    console.log(pieChartData)
+    console.log(pieChartData.labels)
+    // Stwórz nowy wykres kołowy z nowymi danymi
+    var ctxPie = document.getElementById('myPieChart').getContext('2d');
+    myPieChart = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: pieChartData.labels,
+            datasets: [{
+                label: 'Portfolio Distribution',
+                data: pieChartData.data,
+                // backgroundColor i borderColor zostały usunięte, więc będą użyte domyślne kolory
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+}
+let d = 0
 // Funkcja pobierająca dane wykresu
 function fetchChartData(startDate) {
     document.getElementById('loading-spinner').style.display = 'block';
@@ -72,7 +107,7 @@ function fetchChartData(startDate) {
     fetch('/chart-data/?start_date=' + startDate)
         .then(response => response.json())
         .then(data => {
-            updateChart(data);
+            updateChart(data.results);
             document.getElementById('user-preferences-start-date').textContent = startDate;
         })
         .catch(error => {
@@ -104,8 +139,14 @@ function fetchOptimisationData() {
     fetch('/optimisation-data/?' + params.toString())
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log(data.equally_weighted_portfolio)
             updateChart(data.results);
+            updatePieChart(data.equally_portfolio_data); 
+            console.log(data.results);
+            console.log(data.equally_portfolio_data);
+            console.log(data.equally_portfolio_data.labels);
+            console.log(typeof data.equally_portfolio_data); 
+            
             document.getElementById('user-preferences-start-date').textContent = startDate;
             document.getElementById('user-preferences-nlargest').textContent = data.new_nlargest_window;
             document.getElementById('user-preferences-window').textContent = data.new_window;
@@ -119,38 +160,6 @@ function fetchOptimisationData() {
         });
 }
 
-// function fetchOptimisationData() {
-//     const startDate = document.getElementById('optimisation-date-input').value;
-//     const windowValue = document.getElementById('window-input').value;
-//     const nlargestWindow = document.getElementById('nlargest-window-input').value;
-
-//     // Utwórz parametry dla żądania
-//     const params = new URLSearchParams({
-//         optimisation_date: startDate,
-//         window: windowValue,
-//         nlargest_window: nlargestWindow
-//     });
-
-//     document.getElementById('loading-spinner').style.display = 'block';
-//     document.getElementById('chart-container').style.display = 'none';
-
-//     // Wyślij żądanie z parametrami
-//     fetch('/optimisation-data/?' + params.toString())
-//         .then(response => response.json())
-//         .then(data => {
-//             updateChart(data.results);  // Zaktualizuj wykres używając wyników
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//         })
-//         .finally(() => {
-//             document.getElementById('user-preferences-start-date').textContent = startDate;
-//             document.getElementById('user-preferences-nlargest').textContent = data.new_nlargest_window;
-//             document.getElementById('user-preferences-window').textContent = data.new_window;
-//             document.getElementById('loading-spinner').style.display = 'none';
-//             document.getElementById('chart-container').style.display = 'block';
-//         });
-// }
 
 // Obsługa zdarzeń formularza
 document.addEventListener('DOMContentLoaded', function() {

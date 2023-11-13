@@ -3,6 +3,7 @@ import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
 from scipy.optimize import brute
+import json
 
 class StockData:
     def __init__(self, start_date):
@@ -83,7 +84,6 @@ class MarketAnalysis:
         return df.rolling(n).sum().apply(np.exp)
 
     def get_top_tickers(self, date):
-        # Zwraca indeksy top tickers tylko z 'window' bez odwoływania się do 'small_window'
         top_window = self.rolling_returns_large.loc[date].nlargest(self.nlargest_window).index
         return top_window
 
@@ -92,7 +92,8 @@ class MarketAnalysis:
         return portfolio.mean(axis=1).values[0]
 
     def get_current_month_tickers(self):
-        return self.get_top_tickers(self.monthly_returns.index[-1])
+        tickers = self.get_top_tickers(self.monthly_returns.index[-1])
+        return json.dumps(list(tickers))
 
     def plot_performance(self):
         returns = [self.portfolio_performance(date) for date in self.monthly_returns.index[:-1]]
