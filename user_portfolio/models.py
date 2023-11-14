@@ -11,7 +11,7 @@ class User(AbstractUser):
 
 class UserStrategyModel(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    data = models.JSONField(null=True)  # Przechowuje dane jako JSON
+    returns_data = models.JSONField(null=True)  # Przechowuje dane jako JSON
     current_tickers = models.JSONField(null=True)
 
 class MarketAnalysisPreferences(models.Model):

@@ -72,14 +72,6 @@ function updatePieChart(pieChartData) {
     if (myPieChart) {
         myPieChart.destroy();
     }
-    // const samplePieChartData = {
-    //     labels: ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
-    //     data: [10, 20, 30, 40, 50]
-    // };
-    
-    console.log(pieChartData)
-    console.log(pieChartData.labels)
-    // Stwórz nowy wykres kołowy z nowymi danymi
     var ctxPie = document.getElementById('myPieChart').getContext('2d');
     myPieChart = new Chart(ctxPie, {
         type: 'doughnut',
@@ -97,17 +89,19 @@ function updatePieChart(pieChartData) {
         }
     });
 }
-let d = 0
+
 // Funkcja pobierająca dane wykresu
 function fetchChartData(startDate) {
     document.getElementById('loading-spinner').style.display = 'block';
-    document.getElementById('chart-container').style.display = 'none';
+    document.getElementById('charts-wrapper').style.display = 'none';
 
     // Użyj zmiennej `startDate` jako części URL w żądaniu GET
     fetch('/chart-data/?start_date=' + startDate)
         .then(response => response.json())
         .then(data => {
             updateChart(data.results);
+            updatePieChart(data.equally_portfolio_data); 
+            setNewFormValues()
             document.getElementById('user-preferences-start-date').textContent = startDate;
         })
         .catch(error => {
@@ -115,15 +109,15 @@ function fetchChartData(startDate) {
         })
         .finally(() => {
             document.getElementById('loading-spinner').style.display = 'none';
-            document.getElementById('chart-container').style.display = 'block';
+            document.getElementById('charts-wrapper').style.display = 'block';
         });
 }
 
 // Funkcja pobierająca dane do optymalizacji
 function fetchOptimisationData() {
     const startDate = document.getElementById('optimisation-date-input').value;
-    const windowValue = document.getElementById('window-input').value;
-    const nlargestWindow = document.getElementById('nlargest-window-input').value;
+    const windowValue = document.getElementById('optimisation-window-input').value;
+    const nlargestWindow = document.getElementById('optimisation-nlargest-window-input').value;
 
     // Utwórz parametry dla żądania
     const params = new URLSearchParams({
@@ -133,20 +127,15 @@ function fetchOptimisationData() {
     });
 
     document.getElementById('loading-spinner').style.display = 'block';
-    document.getElementById('chart-container').style.display = 'none';
+    document.getElementById('charts-wrapper').style.display = 'none';
 
     // Wyślij żądanie z parametrami
     fetch('/optimisation-data/?' + params.toString())
         .then(response => response.json())
         .then(data => {
-            // console.log(data.equally_weighted_portfolio)
             updateChart(data.results);
-            updatePieChart(data.equally_portfolio_data); 
-            console.log(data.results);
-            console.log(data.equally_portfolio_data);
-            console.log(data.equally_portfolio_data.labels);
-            console.log(typeof data.equally_portfolio_data); 
-            
+            updatePieChart(data.equally_portfolio_data);  
+            setNewFormValues()
             document.getElementById('user-preferences-start-date').textContent = startDate;
             document.getElementById('user-preferences-nlargest').textContent = data.new_nlargest_window;
             document.getElementById('user-preferences-window').textContent = data.new_window;
@@ -156,9 +145,41 @@ function fetchOptimisationData() {
         })
         .finally(() => {
             document.getElementById('loading-spinner').style.display = 'none';
-            document.getElementById('chart-container').style.display = 'block';
+            document.getElementById('charts-wrapper').style.display = 'block';
         });
 }
+
+function updateStocksDate() {
+    // Pobranie obecnej daty
+    const currentDate = new Date();
+
+    // Formatowanie daty
+    const formattedDate = currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+    // Znalezienie elementu w DOM i aktualizacja jego zawartości
+    const dateElement = document.getElementById('stocks-date');
+    if (dateElement) {
+        dateElement.textContent = 'Top stocks for ' + formattedDate;
+    } else {
+        console.error('Element o ID "stocks-date" nie został znaleziony.');
+    }
+}
+
+function setNewFormValues() {
+    // Pobierz wartość z elementu span i ustaw ją jako value dla inputa 'nlargest_window'
+    const nLargestValue = document.getElementById('user-preferences-nlargest').textContent;
+    const nLargestInput = document.getElementById('start-nlargest-window-input');
+    if (nLargestInput && nLargestValue) {
+      nLargestInput.value = parseInt(nLargestValue, 10); // Używamy parseInt, aby upewnić się, że wartość jest liczbą całkowitą
+    }
+  
+    // Pobierz wartość z elementu span i ustaw ją jako value dla inputa 'window'
+    const windowValue = document.getElementById('user-preferences-window').textContent;
+    const windowInput = document.getElementById('start-window-input');
+    if (windowInput && windowValue) {
+      windowInput.value = parseInt(windowValue, 10); // To samo tutaj
+    }
+  }
 
 
 // Obsługa zdarzeń formularza
@@ -174,4 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         fetchOptimisationData(); // Wywołaj funkcję z danymi z formularza
     });
+    updateStocksDate();
+    setNewFormValues()
 });

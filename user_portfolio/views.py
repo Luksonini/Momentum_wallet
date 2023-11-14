@@ -11,7 +11,7 @@ from .utils.momentum import MarketAnalysis
 from .utils.calculate_weights import EqualWeightedPortfolio
 from django.http import JsonResponse
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 # user_portfolio\utils
 # user_portfolio\views.py
@@ -25,14 +25,17 @@ def index(request):
 
     user_preferences, created = MarketAnalysisPreferences.objects.get_or_create(user=request.user)
 
-    if user_strategy_model and user_strategy_model.data:
-        chart_data = user_strategy_model.data
+    if user_strategy_model and user_strategy_model.returns_data:
+        chart_data = user_strategy_model.returns_data
+        equally_portfolio = EqualWeightedPortfolio(user_strategy_model.current_tickers, total_amount=1000)
+        equally_portfolio_data = equally_portfolio.get_chart_data()
 
     return render(request, "user_portfolio/index.html", {
         'strategy_form': strategy_form,
         'chart_data': json.dumps(chart_data) if chart_data else None,
+        'equally_portfolio_data' : equally_portfolio_data,
         'optimisation_form' : optimisation_form,
-        'user_preferences' : user_preferences
+        'user_preferences' : user_preferences,
     })
 
 @login_required(login_url='login')
@@ -53,14 +56,17 @@ def chart_data(request):
     results_json = market_analysis.strategy_results()
     tickers = market_analysis.get_current_month_tickers()
 
-    # strategy_instance, created = 
+   
     UserStrategyModel.objects.update_or_create(
-        user=request.user, defaults={'data': results_json, 'current_tickers' : tickers})
-    # strategy_instance.save() 
+        user=request.user, defaults={'returns_data': results_json, 'current_tickers' : tickers})
+    equally_portfolio = EqualWeightedPortfolio(tickers, total_amount=1000)
+    equally_portfolio_data = equally_portfolio.get_chart_data()
+
 
     response_data = {
         'results': results_json,
-        'piechart_data': tickers,
+        'piechart_data': equally_portfolio_data,
+        'equally_portfolio_data' : equally_portfolio_data
     }
 
     # response = JsonResponse(results_json, encoder=DjangoJSONEncoder, safe=False)
@@ -97,15 +103,14 @@ def optimisation_view(request):
     equally_portfolio_data = equally_portfolio.get_chart_data()
 
     # data, created = 
-    UserStrategyModel.objects.update_or_create(user=request.user, defaults={'data': results_json, 'current_tickers': tickers})
-    # data.save() 
-    print(equally_portfolio_data)
+    UserStrategyModel.objects.update_or_create(user=request.user, defaults={'returns_data': results_json, 'current_tickers': tickers})
+    
     # Dodaj nowe parametry do wyników
     response_data = {
         'results': results_json,
         'new_window': new_window,
         'new_nlargest_window': new_nlargest_window,
-        'piechart_data': tickers,
+        # 'piechart_data': tickers,
         'equally_portfolio_data' : equally_portfolio_data
     }
 
