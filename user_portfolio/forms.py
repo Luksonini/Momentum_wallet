@@ -10,31 +10,37 @@ class CustomDateInput(forms.DateInput):
 
 class StrategyInputForm(forms.Form):
     start_date = forms.DateField(widget=CustomDateInput(attrs={'type': 'date', 'id' : 'start-date-input', 'name': 'start_date', 'class' : 'text-center'}))
+    
     window = forms.IntegerField(
-        label='Okno',
-        min_value=1, max_value=15,
-        widget=forms.NumberInput(attrs={'id': 'start-window-input', 'name': 'start-window', 'class' : 'text-center'})
+        label='Window',
+        min_value=1, max_value=15, initial=8,
+        widget=forms.NumberInput(attrs={'id': 'start-window-input', 'class' : 'text-center'})
     )
     nlargest_window = forms.IntegerField(
-        label='Największe okno',
-        min_value=5, max_value=10, 
-        widget=forms.NumberInput(attrs={'id': 'start-nlargest-window-input', 'name': 'start-nlargest_window', 'class' : 'text-center'})
+        label='Top stocks',
+        min_value=5, max_value=10, initial=10,
+        widget=forms.NumberInput(attrs={'id': 'start-nlargest-window-input', 'class' : 'text-center'})
+    )
+    balance = forms.IntegerField(
+        label='Capital',
+        min_value=1000, max_value=1000000, initial=1000,
+        widget=forms.NumberInput(attrs={'id': 'start-calital-input', 'class' : 'text-center'})
     )
 
 class OptimisationPreferencesForm(forms.ModelForm):
     optimisation_date = forms.DateField(
-        label='Data optymalizacji',
-        widget=CustomDateInput(attrs={'type': 'date', 'id': 'optimisation-date-input', 'name': 'optimisation_date'})
+        label='Start Date',
+        widget=CustomDateInput(attrs={'type': 'date', 'id': 'optimisation-date-input'})
     )
     window = forms.IntegerField(
-        label='Okno',
+        label='Max Window',
         min_value=1, max_value=15, initial=8,
-        widget=forms.NumberInput(attrs={'id': 'optimisation-window-input', 'name': 'window', 'class' : 'text-center'})
+        widget=forms.NumberInput(attrs={'id': 'optimisation-window-input', 'class' : 'text-center'})
     )
     nlargest_window = forms.IntegerField(
-        label='Największe okno',
+        label='Max Top Stocks',
         min_value=5, max_value=10, initial=10,
-        widget=forms.NumberInput(attrs={'id': 'optimisation-nlargest-window-input', 'name': 'nlargest_window', 'class' : 'text-center'})
+        widget=forms.NumberInput(attrs={'id': 'optimisation-nlargest-window-input', 'class' : 'text-center'})
     )
 
     class Meta:

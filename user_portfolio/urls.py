@@ -11,6 +11,8 @@ urlpatterns = [
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
+    path('test', views.test),
+    path('ticker_detail/<str:ticker>', views.ticker_detail, name='ticker_details')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

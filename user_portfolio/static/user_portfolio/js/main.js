@@ -95,8 +95,20 @@ function fetchChartData(startDate) {
     document.getElementById('loading-spinner').style.display = 'block';
     document.getElementById('charts-wrapper').style.display = 'none';
 
+    const windowValue = document.getElementById('start-window-input').value;
+    const nlargestWindow = document.getElementById('start-nlargest-window-input').value;
+    const balance = document.getElementById('start-calital-input').value;
+
+    // Utwórz parametry dla żądania
+    const params = new URLSearchParams({
+        start_date: startDate,
+        window: windowValue,
+        nlargest: nlargestWindow,
+        balance: balance
+    });
+
     // Użyj zmiennej `startDate` jako części URL w żądaniu GET
-    fetch('/chart-data/?start_date=' + startDate)
+    fetch('/chart-data/?' + params.toString())
         .then(response => response.json())
         .then(data => {
             updateChart(data.results);

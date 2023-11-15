@@ -36,7 +36,7 @@
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                        <a class="nav-link" href="{% url 'ticker_detail' %}">Log In</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'register' %}">Register</a>
@@ -50,5 +50,19 @@
             {% block body %}
             {% endblock %}
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var widgetContainers = document.querySelectorAll('.tradingview-widget-container');
+            
+                widgetContainers.forEach(function(container) {
+                    container.addEventListener('click', function(e) {
+                        e.preventDefault(); // Zapobieganie domyślnemu zachowaniu
+                        var ticker = this.getAttribute('data-ticker');
+                        var targetUrl = "{% url 'login' %}".replace('tickerPlaceholder', ticker);
+                        window.location.href = targetUrl;
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

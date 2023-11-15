@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView Widgets with Buttons</title>
+</head>
+<body>
+    <!-- Kontener na widgety TradingView -->
+    <div id="tradingview-widgets-container"></div>
+    
+    <!-- Skrypt do generowania widgetów TradingView -->
+    <script type="text/javascript">
+        // Załóżmy, że 'tickers' jest przekazane z Django
+        var tickers = {{ tickers|safe }};
+
+        tickers.forEach(function(ticker) {
+            var widgetDiv = document.createElement('div');
+            widgetDiv.className = 'tradingview-widget-container';
+
+            var widgetScript = document.createElement('script');
+            widgetScript.type = 'text/javascript';
+            widgetScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js';
+            widgetScript.async = true;
+
+            var chartUrl = "{% url 'login' %}";
+
+            widgetScript.innerHTML = JSON.stringify({
+                "symbol": ticker,
+                "width": "100%",
+                "locale": "en",
+                "colorTheme": "light",
+                "isTransparent": false,
+                "largeChartUrl": chartUrl
+            });
+
+            widgetDiv.appendChild(widgetScript);
+            document.getElementById('tradingview-widgets-container').appendChild(widgetDiv);
+        });
+    </script>
+    
+    <!-- Skrypt do dodawania guzików -->
+    <script>
+        // Funkcja dodająca guzik do elementu
+        function addButtonToElement(element) {
+            var button = document.createElement('button');
+            button.innerText = 'Mój Guzik';
+            button.addEventListener('click', function() {
+                alert('Kliknięto guzik!');
+            });
+            element.appendChild(button);
+        }
+
+        // Obserwator do monitorowania zmian w DOM
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    // Sprawdź, czy jest to element i czy ma odpowiednią klasę
+                    if (node.nodeType === 1 && node.matches('.tv-category-header__content.tv-symbol-info-widget__content.js-widget-content')) {
+                        addButtonToElement(node);
+                    }
+                });
+            });
+        });
+
+        // Konfiguracja i uruchomienie obserwatora
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Nie zapomnij odłączyć obserwatora, gdy nie jest już potrzebny
+        // observer.disconnect();
+    </script>
+</body>
+</html>
