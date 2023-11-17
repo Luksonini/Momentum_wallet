@@ -1,0 +1,70 @@
+{% extends "user_portfolio/layout.html" %}
+{% load static %}
+{% block body %}
+
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container container max-w-8xl" style="height: 800px;">
+    <div id="tradingview_d7bdc" style="height:calc(100% - 32px);width:100%"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+    new TradingView.widget(
+    {
+    "autosize": true,
+    "symbol": `{{ticker}}`,
+    "interval": "D",
+    "timezone": "Etc/UTC",
+    "theme": "light",
+    "style": "1",
+    "locale": "en",
+    "enable_publishing": false,
+    "allow_symbol_change": true,
+    "container_id": "tradingview_d7bdc"
+  }
+    );
+    </script>
+  </div>
+  <!-- TradingView Widget END -->
+
+  <div class="flex flex-col">
+    <div class="grid grid-cols-6 gap-4 mb-4"> <!-- Nagłówki -->
+      <div class="font-bold">Pozycja</div>
+      <div class="font-bold">Wolumen</div>
+      <!-- pozostałe nagłówki -->
+    </div>
+  
+    <div id="data-container" class="flex flex-col space-y-2">
+      <!-- Dane wypełnione dynamicznie przez JavaScript -->
+    </div>
+  </div>
+
+
+  <script>
+    fetch('/api/data')
+  .then(response => response.json())
+  .then(data => {
+    const dataContainer = document.getElementById('data-container');
+    data.forEach(item => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'grid grid-cols-6 gap-4';
+
+      const positionDiv = document.createElement('div');
+      positionDiv.textContent = item.position;
+
+      const volumeDiv = document.createElement('div');
+      volumeDiv.textContent = item.volume;
+      volumeDiv.className = 'text-center'; // Przykład klasy dla stylizacji
+
+      // Dodaj kolejne `div` dla każdego elementu danych
+      // ...
+
+      rowDiv.appendChild(positionDiv);
+      rowDiv.appendChild(volumeDiv);
+      // Dodaj pozostałe `div` do rowDiv
+      // ...
+
+      dataContainer.appendChild(rowDiv);
+    });
+  });
+  </script>
+  {% endblock %}
+

@@ -32,7 +32,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 30  # Ilość wyników na stronę
 }
 
-
+API_NINJAS_KEY = os.getenv('+zhgPUvc2xvwDNSZsaZd8A==PrkYMsTwM93rZtrk')
 
 Q_CLUSTER = {
     'name': 'DjangORM',

@@ -193,6 +193,114 @@ function setNewFormValues() {
     }
   }
 
+function populateTickerData(data) {
+    const container = document.getElementById('ticker-display-container');
+    container.innerHTML = ''; // Czyść kontener przed dodaniem nowych elementów
+    {
+        const container = document.getElementById('ticker-display-container');
+        container.className = 'w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4';
+
+        Object.entries(data).forEach(([ticker, info]) => {
+            const tickerAnchor = document.createElement('a');
+            tickerAnchor.href = `/ticker_detail/${ticker}`; // Ustaw adres URL
+            tickerAnchor.className = 'bg-white shadow rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 transform hover:scale-105';
+            tickerAnchor.style.textDecoration = 'none';
+            tickerAnchor.style.backfaceVisibility = 'hidden';
+            tickerAnchor.style.color = 'inherit';
+            tickerAnchor.style.WebkitFontSmoothing = 'subpixel-antialiased';
+
+            const logoImg = document.createElement('img');
+            logoImg.src = info.logo;
+            logoImg.alt = info.company_name;
+            logoImg.className = 'w-40 h-40 object-contain';
+
+            const tickerSymbol = document.createElement('div');
+            tickerSymbol.textContent = ticker;
+            tickerSymbol.className = 'text-lg font-semibold';
+
+            const companyName = document.createElement('div');
+            companyName.textContent = info.company_name;
+            companyName.className = 'text-sm text-gray-600';
+
+            const currentPrice = document.createElement('div');
+            currentPrice.textContent = `${info.current_price.toFixed(2)}$`;
+            currentPrice.className = 'text-xl font-bold';
+            currentPrice.id = `price-${ticker}`;
+
+            const priceChange = document.createElement('div');
+            priceChange.textContent = info.price_change.toFixed(2) + '$';
+            priceChange.className = `text-${info.price_change < 0 ? 'red' : 'green'}-500`;
+            priceChange.id = `change-${ticker}`;
+
+            const percentChange = document.createElement('div');
+            percentChange.textContent = `${info.percent_change.toFixed(2)}%`;
+            percentChange.className = `text-${info.percent_change < 0 ? 'red' : 'green'}-500`;
+            percentChange.id = `percent-${ticker}`; 
+
+            [logoImg, tickerSymbol, companyName, currentPrice, priceChange, percentChange].forEach(el => {
+                tickerAnchor.appendChild(el); // Dodaj elementy do anchor tag
+            });
+
+            container.appendChild(tickerAnchor);
+        });
+        }
+    }
+
+
+function createTickerDisplay() {
+const savedData = localStorage.getItem('tickerData');
+if (savedData) {
+    populateTickerData(JSON.parse(savedData));
+}
+fetch('/tickers_info/')
+    .then(response => {
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+    })
+    .then(data => {
+        localStorage.setItem('tickerData', JSON.stringify(data));
+        populateTickerData(data);
+      })
+    .catch(error => {
+    console.error('Could not fetch ticker data:', error);
+    });
+}
+  
+function updateTickerDisplay() {
+    fetch('/tickers_info/')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        localStorage.setItem('tickerData', JSON.stringify(data));
+        Object.entries(data).forEach(([ticker, info]) => {
+          // Zaktualizuj istniejące elementy, jeśli istnieją
+
+          const currentPriceElement = document.getElementById(`price-${ticker}`);
+          const priceChangeElement = document.getElementById(`change-${ticker}`);
+          const percentChangeElement = document.getElementById(`percent-${ticker}`);
+  
+          if (currentPriceElement && priceChangeElement && percentChangeElement) {
+            currentPriceElement.textContent = `${info.current_price.toFixed(2)}$`;
+            priceChangeElement.textContent = info.price_change.toFixed(2) + '$';
+            percentChangeElement.textContent = `${info.percent_change.toFixed(2)}%`;
+  
+            // Aktualizacja koloru tekstu dla zmiany ceny
+            priceChangeElement.className = `text-${info.price_change < 0 ? 'red' : 'green'}-500`;
+            percentChangeElement.className = `text-${info.percent_change < 0 ? 'red' : 'green'}-500`;
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Could not fetch ticker data:', error);
+      });
+  }
+  
 
 // Obsługa zdarzeń formularza
 document.addEventListener('DOMContentLoaded', function() {
@@ -207,6 +315,9 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         fetchOptimisationData(); // Wywołaj funkcję z danymi z formularza
     });
+    createTickerDisplay()
     updateStocksDate();
-    setNewFormValues()
+    setNewFormValues();
+  // Wywołanie funkcji
+    setInterval(updateTickerDisplay, 60000); // Co minutę
 });

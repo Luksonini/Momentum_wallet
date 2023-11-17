@@ -27,7 +27,8 @@ def index(request):
 
     if user_strategy_model and user_strategy_model.returns_data:
         chart_data = user_strategy_model.returns_data
-        equally_portfolio = EqualWeightedPortfolio(user_strategy_model.current_tickers, total_amount=user_preferences.balance)
+        # equally_portfolio = EqualWeightedPortfolio(user_strategy_model.current_tickers, total_amount=user_preferences.balance)
+        equally_portfolio = EqualWeightedPortfolio(total_amount=int(user_preferences.balance), tickers=user_strategy_model.current_tickers)
         equally_portfolio_data = equally_portfolio.get_chart_data()
 
     return render(request, "user_portfolio/index.html", {
@@ -64,7 +65,7 @@ def chart_data(request):
    
     UserStrategyModel.objects.update_or_create(
         user=request.user, defaults={'returns_data': results_json, 'current_tickers' : tickers})
-    equally_portfolio = EqualWeightedPortfolio(tickers, total_amount=user_preferences.balance)
+    equally_portfolio = EqualWeightedPortfolio(user_preferences.balance, tickers)
     equally_portfolio_data = equally_portfolio.get_chart_data()
 
 
@@ -82,11 +83,8 @@ def chart_data(request):
 def optimisation_view(request):
     # Pobierz wartości z parametrów zapytania
     optimisation_date = request.GET.get('optimisation_date')
-    print(f"optimisation_date {optimisation_date}")
     window = request.GET.get('window')
-    print(f"to jest window {window}")
     nlargest_window = request.GET.get('nlargest_window')
-    print(f"to jest nlargest_window {nlargest_window}")
     market_analysis = MarketAnalysis(start_date=optimisation_date)
     optimal_params = market_analysis.optimize_parameters(window_range=(1, int(window) + 1), nlargest_range=(5, int(nlargest_window) + 1))
 
@@ -107,7 +105,8 @@ def optimisation_view(request):
     # Wywołaj metodę strategy_results dla optymalizowanej strategii
     results_json = market_analysis.strategy_results()
     tickers = market_analysis.get_current_month_tickers()
-    equally_portfolio = EqualWeightedPortfolio(tickers, total_amount=user_preferences.balance)
+    print(tickers)
+    equally_portfolio = EqualWeightedPortfolio(tickers, total_amount=int(user_preferences.balance))
     equally_portfolio_data = equally_portfolio.get_chart_data()
 
     # data, created = 
@@ -124,12 +123,21 @@ def optimisation_view(request):
 
     return JsonResponse(response_data, encoder=DjangoJSONEncoder, safe=False)
 
-def test(request):
-    tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'FB']
-    return render(request, "user_portfolio/test.html", {'tickers' : tickers})
+def tickers_info(request):
+    # Przykładowe dane - dostosuj je do swoich potrzeb
+    user_strategy_model = UserStrategyModel.objects.filter(user=request.user).first()
+    user_preferences = MarketAnalysisPreferences.objects.filter(user=request.user).first()
+    tickers = user_strategy_model.current_tickers
+    total_amount = user_preferences.balance
+   
+    portfolio = EqualWeightedPortfolio(int(total_amount), tickers)
+    ticker_info = portfolio.get_ticker_info_dict()
 
-def ticker_detail(request):
-    return render(request, "user_portfolio/test.html")
+    return JsonResponse(ticker_info)
+
+
+def ticker_detail(request, ticker):
+    return render(request, "user_portfolio/portfolio.html", {'ticker': ticker})
 
 
 

@@ -9,5 +9,5 @@ class UserStrategyModelAdmin(admin.ModelAdmin):
 
 @admin.register(MarketAnalysisPreferences)
 class MarketAnalysisPreferencesAdmin(admin.ModelAdmin):
-    list_display = ('user', 'start_date', 'window', 'nlargest_window')
+    list_display = ('user', 'start_date', 'window', 'nlargest_window', 'balance')
     search_fields = ('user__username',)
