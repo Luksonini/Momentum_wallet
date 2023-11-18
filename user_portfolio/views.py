@@ -9,6 +9,7 @@ from .forms import StrategyInputForm, OptimisationPreferencesForm
 from .models import User, UserStrategyModel, MarketAnalysisPreferences
 from .utils.momentum import MarketAnalysis
 from .utils.calculate_weights import EqualWeightedPortfolio
+from .utils.calculate_user_portfolio import UserPortfolio
 from django.http import JsonResponse
 import json
 from datetime import datetime, timedelta
@@ -137,8 +138,14 @@ def tickers_info(request):
 
 
 def ticker_detail(request, ticker):
+
     return render(request, "user_portfolio/portfolio.html", {'ticker': ticker})
 
+def user_portfolio_api(request):
+    user_portfolio = UserPortfolio(user=request.user)
+    portfolio_info = user_portfolio.get_portfolio_info()
+
+    return JsonResponse(portfolio_info)
 
 
 def login_view(request):
