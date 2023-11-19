@@ -1,9 +1,12 @@
 {% extends "user_portfolio/layout.html" %}
 {% load static %}
+{% block scripts %}
+  <script src="{% static 'user_portfolio/js/portfolio.js' %}"></script>
+{% endblock scripts %}
 {% block body %}
 
 <!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container container max-w-8xl" style="height: 800px;">
+<div class="tradingview-widget-container container max-w-8xl" style="height: 750px;">
     <div id="tradingview_d7bdc" style="height:calc(100% - 32px);width:100%"></div>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
@@ -23,98 +26,26 @@
     );
     </script>
   </div>
+  <div>
+    <div class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4">
+      {% for key, name in strategy_tickers_dict.items %}
+      <button data-ticker="{{key}}" class="strategy-button border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded focus:outline-none hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">{{name}} ({{key}})</button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <form method="get" class="min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow">
+    {{ filter.form.as_p | safe }}
+  </form>
+
 
   <div id="portfolio-display-container" class="container mx-auto px-4"></div>
 
-
+  <input type="text" name="ticker" value="{{ request.GET.ticker }}" />
   <script>
-    function populatePortfolioData(data) {
-      console.log(data); // Dla celów debugowania
-      const container = document.getElementById('portfolio-display-container');
-      container.innerHTML = ''; // Wyczyść kontener przed dodaniem nowych elementów
-    
-      // Tworzenie nagłówków
-      const headers = ['Company Info', 'Quantity', 'Purchase Price', 'Current Price', 'Value', 'Price Change', 'Percent Change'];
-      const headerDiv = document.createElement('div');
-      headerDiv.className = 'grid grid-cols-7 text-center bg-gray-200 p-2'; // Stylizacja nagłówka
-      headers.forEach(headerText => {
-        const header = document.createElement('div');
-        header.textContent = headerText;
-        header.className = 'col-span-1'; // Dostosuj rozpiętość według potrzeb
-        headerDiv.appendChild(header);
-      });
-      container.appendChild(headerDiv);
-    
-      // Iteracja po każdym wpisie w obiekcie danych
-      Object.entries(data).forEach(([ticker, info]) => {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'grid grid-cols-7 text-center p-2 hover:bg-gray-100';// Stylizacja wiersza
-          rowDiv.onclick = function() {
-            createTradingViewWidget(ticker);
-        };
-        // Kolumna z informacjami o firmie (ticker, nazwa firmy)
-        const companyInfoDiv = document.createElement('div');
-        companyInfoDiv.className = 'text-left'; // Stylizacja
-        const companyName = document.createElement('div');
-        companyName.textContent = `${info.company_name} (${ticker})`;
-        companyName.className = 'company-info-class'; // Dodaj swoją klasę CSS
-        companyInfoDiv.appendChild(companyName);
-        rowDiv.appendChild(companyInfoDiv);
-    
-        // Reszta danych
-        headers.slice(1).forEach(header => {
-          const cellDiv = document.createElement('div');
-
-          let textContent = info[header.toLowerCase().replace(/ /g, '_')];
-    
-          if (typeof textContent === 'number') {
-            textContent = textContent.toFixed(2) + '$';
-          }
-    
-          cellDiv.textContent = textContent;
-          cellDiv.className = 'col-span-1';
-          if (header === 'Price Change' || header === 'Percent Change') {
-            cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
-          }
-    
-          rowDiv.appendChild(cellDiv);
-        });
-        
-        container.appendChild(rowDiv);
-      });
-    }
-
-    function createTradingViewWidget(ticker) {
-      // Najpierw usuń istniejący widżet, jeśli istnieje
-      const container = document.getElementById('tradingview_d7bdc');
-      container.innerHTML = '';
-  
-      // Tworzenie nowego widżetu
-      new TradingView.widget({
-          "autosize": true,
-          "symbol": ticker,
-          "interval": "D",
-          "timezone": "Etc/UTC",
-          "theme": "light",
-          "style": "1",
-          "locale": "en",
-          "enable_publishing": false,
-          "allow_symbol_change": true,
-          "container_id": "tradingview_d7bdc"
-      });
-  }
-    
-    function createPortfolioDisplay() {
-      fetch('/user_portfolio_api/')
-          .then(response => response.json())
-          .then(data => populatePortfolioData(data))
-          .catch(error => console.error('Could not fetch portfolio data:', error));
-    }
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      createPortfolioDisplay();
-    });
+    window.displayed_ticker = "{{ ticker|safe }}";
   </script>
+ 
 
 
   {% endblock %}

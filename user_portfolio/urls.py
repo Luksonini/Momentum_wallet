@@ -13,7 +13,8 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path('tickers_info/', views.tickers_info),
     path('ticker_detail/<str:ticker>', views.ticker_detail, name='ticker_detail'),
-    path('user_portfolio_api/', views.user_portfolio_api, name='ticker_detail')
+    path('user_portfolio_api/', views.user_portfolio_api, name='ticker_detail'),
+    path('ticker_search_suggestions/', views.ticker_suggestions, name='ticker_suggestions'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

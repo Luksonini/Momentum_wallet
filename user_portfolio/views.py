@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import StrategyInputForm, OptimisationPreferencesForm
-from .models import User, UserStrategyModel, MarketAnalysisPreferences
+from .models import User, UserStrategyModel, MarketAnalysisPreferences, MappedTickers
 from .utils.momentum import MarketAnalysis
 from .utils.calculate_weights import EqualWeightedPortfolio
 from .utils.calculate_user_portfolio import UserPortfolio
@@ -14,6 +14,8 @@ from django.http import JsonResponse
 import json
 from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
+from .filters import MappedTickersFilter
+from django.db.models import Q
 # user_portfolio\utils
 # user_portfolio\views.py
 
@@ -138,8 +140,32 @@ def tickers_info(request):
 
 
 def ticker_detail(request, ticker):
+    strategy_tickers = UserStrategyModel.objects.filter(user=request.user).first()
+    strategy_tickers = strategy_tickers.current_tickers if strategy_tickers else None
+    strategy_tickers = json.loads(strategy_tickers)
+    comapny_names = {}
+    for ticker in strategy_tickers:
+        ticker.replace('.', '-') if '.' in ticker else ticker
+        mapped_tickers = MappedTickers.objects.filter(ticker=ticker).first()
+        comapny_names[mapped_tickers.ticker] = mapped_tickers.company_name
 
-    return render(request, "user_portfolio/portfolio.html", {'ticker': ticker})
+    filter = MappedTickersFilter(request.GET, queryset=MappedTickers.objects.all())
+
+    return render(request, "user_portfolio/portfolio.html", {'ticker': ticker, 'strategy_tickers_dict' : comapny_names, 'filter': filter})
+
+def ticker_suggestions(request):
+    query = request.GET.get('query', '')
+    data = []
+
+    if query:  # Sprawdzanie, czy query nie jest pustym stringiem
+        suggestions = MappedTickers.objects.filter(
+            Q(ticker__icontains=query) | Q(company_name__icontains=query)
+        )[:2]  # ograniczenie do 2 sugestii
+
+        data = [{'ticker': t.ticker, 'company_name': t.company_name} for t in suggestions]
+
+    return JsonResponse(data, safe=False)
+
 
 def user_portfolio_api(request):
     user_portfolio = UserPortfolio(user=request.user)

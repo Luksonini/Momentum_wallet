@@ -82,15 +82,6 @@ class EqualWeightedPortfolio:
             self.prepare_chart_data()
         return self.chart_data
 
-# # Przykład użycia
-# tickers = ["AAPL", "MSFT", "AMZN", "ADBE", "MMM"]
-# total_amount = 1000
-# portfolio = EqualWeightedPortfolio(total_amount, tickers)
-# portfolio.calculate_portfolio()  # To musi być wywołane przed get_chart_data
-# chart_data = portfolio.get_chart_data()
-# ticker_info = portfolio.get_ticker_info_dict()
-# print(chart_data)
-# print(ticker_info)
 
 
 
