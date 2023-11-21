@@ -202,7 +202,7 @@ function populateTickerData(data) {
 
         Object.entries(data).forEach(([ticker, info]) => {
             const tickerAnchor = document.createElement('a');
-            tickerAnchor.href = `/ticker_detail/${ticker}`; // Ustaw adres URL
+            tickerAnchor.href = `/ticker_detail/${ticker}/`; // Ustaw adres URL
             tickerAnchor.className = 'bg-white shadow rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 transform hover:scale-105';
             tickerAnchor.style.textDecoration = 'none';
             tickerAnchor.style.backfaceVisibility = 'hidden';
@@ -245,7 +245,7 @@ function populateTickerData(data) {
         });
         }
     }
-
+ 
 
 function createTickerDisplay() {
 const savedData = localStorage.getItem('tickerData');

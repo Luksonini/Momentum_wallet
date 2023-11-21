@@ -1,6 +1,6 @@
 from django import forms
 import datetime
-from .models import MarketAnalysisPreferences
+from .models import MarketAnalysisPreferences, PortfolioEntry
 
 class CustomDateInput(forms.DateInput):
     def __init__(self, *args, **kwargs):
@@ -34,7 +34,7 @@ class OptimisationPreferencesForm(forms.ModelForm):
     )
     window = forms.IntegerField(
         label='Max Window',
-        min_value=1, max_value=15, initial=8,
+        min_value=1, max_value=80, initial=8,
         widget=forms.NumberInput(attrs={'id': 'optimisation-window-input', 'class' : 'text-center'})
     )
     nlargest_window = forms.IntegerField(
@@ -46,3 +46,23 @@ class OptimisationPreferencesForm(forms.ModelForm):
     class Meta:
         model = MarketAnalysisPreferences
         fields = ['optimisation_date', 'window', 'nlargest_window']
+
+
+class PortfolioEntryForm(forms.ModelForm):
+    class Meta:
+        model = PortfolioEntry
+        fields = ['ticker_symbol', 'purchase_price', 'quantity']
+        widgets = {
+            'ticker_symbol': forms.TextInput(attrs={
+                'class': 'hidden',   
+            }),
+            'purchase_price': forms.NumberInput(attrs={
+                'class': 'hidden',
+                'id' : 'puthase_price'
+               
+            }),
+            'quantity': forms.NumberInput(attrs={
+                'class': 'mt-1 block w-full border-2 border-gray-300 bg-white py-2 px-4 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+                'id' : 'quantity'
+            }),
+        }

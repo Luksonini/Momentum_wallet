@@ -32,3 +32,11 @@ class MappedTickersAdmin(admin.ModelAdmin):
     list_display = ('ticker', 'company_name', 'logo_url')  
     search_fields = ('ticker', 'company_name') 
 
+@admin.register(Watchlist)
+class WatchlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'display_tickers')
+    search_fields = ('user__username', 'tickers__ticker')
+
+    def display_tickers(self, obj):
+        return ", ".join([ticker.ticker for ticker in obj.tickers.all()])
+    display_tickers.short_description = 'Observed_tickers'

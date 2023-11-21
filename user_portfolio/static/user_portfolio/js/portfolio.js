@@ -1,5 +1,5 @@
 function populatePortfolioData(data) {
-      
+    console.log(data)  
     const container = document.getElementById('portfolio-display-container');
     container.innerHTML = ''; // Wyczyść kontener przed dodaniem nowych elementów
   
@@ -91,42 +91,97 @@ function populatePortfolioData(data) {
             const ticker = this.getAttribute('data-ticker').replace(/-/g, '.');
             window.displayed_ticker = ticker;
             createTradingViewWidget(ticker);
+            updateWatchlistFormActions(ticker);
         });
     });
 }
 
-  function initializeTickerSuggestions() {
-    const searchInput = document.getElementById('id_company_name');
-    const suggestionsList = document.createElement('ul');
-    suggestionsList.classList.add('suggestions-list'); // Dodaj klasę dla stylizacji
-    searchInput.parentNode.insertBefore(suggestionsList, searchInput.nextSibling);
-
-    searchInput.addEventListener('input', function(e) {
-        const query = e.target.value;
-
-        fetch('/ticker_search_suggestions/?query=' + query)
-            .then(response => response.json())
-            .then(data => {
-                // Czyszczenie poprzednich sugestii
-                suggestionsList.innerHTML = '';
-
-                // Dodawanie nowych sugestii do listy
-                data.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = item.ticker + ' - ' + item.company_name;
-                    listItem.addEventListener('click', function() {
-                        searchInput.value = item.ticker; // Możesz dostosować to zachowanie
-                        suggestionsList.innerHTML = ''; // Czyszczenie listy po wyborze
-                    });
-                    suggestionsList.appendChild(listItem);
-                });
-            })
-            .catch(error => console.error('Error:', error));
-    });
+function updateWatchlistFormActions(ticker) {
+  // Zakładając, że masz tylko jeden formularz do aktualizacji
+  // Jeśli jest ich więcej, użyj pętli lub innych metod selekcji
+  const form = document.getElementById('remove-ticker-form');
+  if (form) {
+      form.action = `/ticker_detail/${ticker}/`; // Zaktualizuj akcję formularza
+  }
 }
+
+function initializeTickerSuggestions() {
+  const searchInput = document.getElementById('id_company_name');
+  const suggestionsList = document.createElement('ul');
+  suggestionsList.classList.add('suggestions-list');
+  searchInput.parentNode.insertBefore(suggestionsList, searchInput.nextSibling);
+
+  searchInput.addEventListener('input', function(e) {
+      const query = e.target.value;
+
+      fetch('/ticker_search_suggestions/?query=' + query)
+          .then(response => response.json())
+          .then(data => {
+              suggestionsList.innerHTML = ''; // Czyszczenie poprzednich sugestii
+
+              data.forEach(item => {
+                  const form = document.createElement('form');
+                  form.method = 'post';
+                  form.action = `/ticker_detail/${window.displayed_ticker}/`;
+
+                  // Dodaj pole ukryte z tokenem CSRF
+                  const csrfInput = document.createElement('input');
+                  csrfInput.type = 'hidden';
+                  csrfInput.name = 'csrfmiddlewaretoken';
+                  csrfInput.value = window.csrfToken; // Użyj tokenu z zmiennej globalnej
+                  form.appendChild(csrfInput);
+
+                  // Pole ukryte przechowujące wartość tickera
+                  const hiddenInput = document.createElement('input');
+                  hiddenInput.type = 'hidden';
+                  hiddenInput.name = 'ticker';
+                  hiddenInput.value = item.ticker;
+
+                  // Przycisk lub inny element klikalny
+                  const submitButton = document.createElement('button');
+                  submitButton.type = 'submit';
+                  submitButton.textContent = item.ticker + ' - ' + item.company_name;
+                  
+
+                  form.appendChild(hiddenInput);
+                  form.appendChild(submitButton);
+
+                  const listItem = document.createElement('li');
+                  listItem.appendChild(form);
+                  suggestionsList.appendChild(listItem);
+              });
+          })
+          .catch(error => console.error('Error:', error));
+  });
+}
+
+function fetchTickerPrice(ticker) {
+  fetch(`/searching_ticker_value_api/?ticker=${ticker}`)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+      })
+      .then(data => {
+          if (data.error) {
+              console.error('Error:', data.error);
+          } else {
+              console.log('Ticker Price:', data.price);
+              // Możesz tutaj zaktualizować interfejs użytkownika, wyświetlając cenę
+          }
+      })
+      .catch(error => {
+          console.error('Fetch error:', error);
+      });
+}
+
 
   document.addEventListener('DOMContentLoaded', function() {
     createPortfolioDisplay();
     widgetOnTickerClick();
     initializeTickerSuggestions();
+    createTradingViewWidget(window.displayed_ticker) 
+    const formTickerName = document.getElementById('form-ticker')
+    formTickerName.innerHTML = window.displayed_ticker
   });

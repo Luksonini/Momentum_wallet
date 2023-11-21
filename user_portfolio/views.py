@@ -5,17 +5,26 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import StrategyInputForm, OptimisationPreferencesForm
-from .models import User, UserStrategyModel, MarketAnalysisPreferences, MappedTickers
+from .forms import StrategyInputForm, OptimisationPreferencesForm, PortfolioEntryForm
+from .models import User, UserStrategyModel, MarketAnalysisPreferences, MappedTickers, Portfolio, Watchlist
 from .utils.momentum import MarketAnalysis
 from .utils.calculate_weights import EqualWeightedPortfolio
-from .utils.calculate_user_portfolio import UserPortfolio
+from .utils.calculate_user_portfolio import UserPortfolio_utils
 from django.http import JsonResponse
 import json
 from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 from .filters import MappedTickersFilter
 from django.db.models import Q
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from .serializesrs import PortfolioEntrySerializer, PortfolioSerializer
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ValidationError
+from .models import PortfolioEntry
+import json
 # user_portfolio\utils
 # user_portfolio\views.py
 
@@ -141,17 +150,55 @@ def tickers_info(request):
 
 def ticker_detail(request, ticker):
     strategy_tickers = UserStrategyModel.objects.filter(user=request.user).first()
-    strategy_tickers = strategy_tickers.current_tickers if strategy_tickers else None
-    strategy_tickers = json.loads(strategy_tickers)
-    comapny_names = {}
-    for ticker in strategy_tickers:
-        ticker.replace('.', '-') if '.' in ticker else ticker
-        mapped_tickers = MappedTickers.objects.filter(ticker=ticker).first()
-        comapny_names[mapped_tickers.ticker] = mapped_tickers.company_name
+    strategy_tickers = json.loads(strategy_tickers.current_tickers) if strategy_tickers and strategy_tickers.current_tickers else []
+    company_names = {}
+    print(ticker)
+    for strategy_ticker in strategy_tickers:
+        formatted_ticker = strategy_ticker.replace('.', '-') if '.' in strategy_ticker else strategy_ticker
+        mapped_tickers = MappedTickers.objects.filter(ticker=formatted_ticker).first()
+        if mapped_tickers:
+            company_names[mapped_tickers.ticker] = mapped_tickers.company_name
+
+    watchlist = Watchlist.objects.filter(user=request.user).first()
+    watchlist_tickers = watchlist.tickers.all() if watchlist else []
+
+    if request.method == 'POST':
+        form = PortfolioEntryForm(request.POST)
+        if form.is_valid():
+            portfolio_entry = form.save(commit=False)
+            portfolio_entry.portfolio = request.user.portfolio
+            portfolio_entry.save()
+
+        elif 'ticker' in request.POST:
+            ticker_adding_to_watchlist = request.POST.get('ticker')  
+            if ticker_adding_to_watchlist:
+                watchlist_ticker = MappedTickers.objects.filter(ticker=ticker_adding_to_watchlist).first()
+                if watchlist_ticker:
+                    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+                    watchlist.tickers.add(watchlist_ticker)
+                    watchlist.save()
+
+        elif 'remove_ticker' in request.POST:
+            ticker_removed_from_watchlist = request.POST.get('remove_ticker')
+            if ticker_removed_from_watchlist:
+                watchlist_ticker = MappedTickers.objects.filter(ticker=ticker_removed_from_watchlist).first()
+                if watchlist_ticker:
+                    watchlist = Watchlist.objects.get(user=request.user)
+                    watchlist.tickers.remove(watchlist_ticker)
+                    watchlist.save()
+    else:
+        form = PortfolioEntryForm()
 
     filter = MappedTickersFilter(request.GET, queryset=MappedTickers.objects.all())
 
-    return render(request, "user_portfolio/portfolio.html", {'ticker': ticker, 'strategy_tickers_dict' : comapny_names, 'filter': filter})
+    return render(request, "user_portfolio/portfolio.html", {
+        'ticker': ticker, 
+        'strategy_tickers_dict': company_names,
+        'watchlist_tickers': watchlist_tickers,
+        'filter': filter,
+        'form': form
+    })
+
 
 def ticker_suggestions(request):
     query = request.GET.get('query', '')
@@ -168,10 +215,25 @@ def ticker_suggestions(request):
 
 
 def user_portfolio_api(request):
-    user_portfolio = UserPortfolio(user=request.user)
-    portfolio_info = user_portfolio.get_portfolio_info()
+    if request.method == 'GET':
+        user_portfolio = UserPortfolio_utils(user=request.user)
+        portfolio_info = user_portfolio.get_portfolio_info()
+        return JsonResponse(portfolio_info)
 
-    return JsonResponse(portfolio_info)
+import yfinance as yf
+def searching_ticker_value(request):
+    if request.method == 'GET':
+        ticker = request.GET.get('ticker')
+        if ticker:
+            try:
+                data = yf.download(ticker, period="1d")['Close'].iloc[-1]
+                return JsonResponse({'ticker': ticker, 'price': data})
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=400)
+        else:
+            return JsonResponse({'error': 'No ticker provided'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 def login_view(request):
@@ -192,7 +254,6 @@ def login_view(request):
             })
     else:
         return render(request, "user_portfolio/login.html")
-
 
 def logout_view(request):
     logout(request)

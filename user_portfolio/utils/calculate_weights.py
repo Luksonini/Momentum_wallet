@@ -1,6 +1,7 @@
 import json
 import yfinance as yf
 import requests
+from ..models import MappedTickers
 
 class EqualWeightedPortfolio:
     def __init__(self, total_amount, tickers, precision=2):
@@ -12,6 +13,7 @@ class EqualWeightedPortfolio:
         self.last_close_prices = None
         self.previous_close_prices = None
         self.chart_data = None
+
 
     def fetch_last_close_prices(self):
         # Pobierz dane za ostatnie dwa dni
@@ -32,20 +34,12 @@ class EqualWeightedPortfolio:
         self.cash_left = round(self.cash_left, self.precision)
 
     def get_company_logo_and_name(self, ticker):
-        api_url = f'https://api.api-ninjas.com/v1/logo?ticker={ticker}'
-        response = requests.get(api_url, headers={'X-Api-Key': '+zhgPUvc2xvwDNSZsaZd8A==PrkYMsTwM93rZtrk'})
-    
-        if response.status_code == requests.codes.ok:
-            data = response.json()
-            if data:
-               name = data[0].get('name')
-               image = data[0].get('image')
-               return name, image
-            else:
-                return None, None
-        else:
-            return "Error:", response.status_code, response.text
-
+        try:
+            mapped_ticker = MappedTickers.objects.get(ticker=ticker)
+            return mapped_ticker.company_name, mapped_ticker.logo_url
+        except MappedTickers.DoesNotExist:
+            return None, None
+        
     def get_ticker_info_dict(self):
         if self.last_close_prices is None or self.previous_close_prices is None:
             self.fetch_last_close_prices()
@@ -56,14 +50,14 @@ class EqualWeightedPortfolio:
             previous_price = self.previous_close_prices[ticker]
             price_change = current_price - previous_price
             percent_change = (price_change / previous_price) * 100
-            company_name, image = self.get_company_logo_and_name(ticker)
+            company_name, logo = self.get_company_logo_and_name(ticker)
             ticker_info_dict[ticker] = {
                 'ticker': ticker,
                 'current_price': round(current_price, self.precision),
                 'price_change': round(price_change, self.precision),
                 'percent_change': round(percent_change, self.precision),
-                'company_name' :  company_name,
-                'logo' : image,
+                'company_name': company_name,
+                'logo': logo,
             }
         return ticker_info_dict
 

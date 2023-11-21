@@ -2,7 +2,7 @@ import yfinance as yf
 from ..models import Portfolio, MappedTickers
 from decimal import Decimal
 
-class UserPortfolio:
+class UserPortfolio_utils:
     def __init__(self, user, precision=2):
         self.user = user
         self.precision = precision

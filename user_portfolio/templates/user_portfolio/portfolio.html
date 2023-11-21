@@ -13,7 +13,7 @@
     new TradingView.widget(
     {
     "autosize": true,
-    "symbol": `{{ticker}}`,
+    "symbol": `${window.displayed_ticker}`,
     "interval": "D",
     "timezone": "Etc/UTC",
     "theme": "light",
@@ -26,11 +26,41 @@
     );
     </script>
   </div>
+  to jest przekazany ticker {{ticker}}
+  <hr>
   <div>
     <div class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4">
+      <p class="font-bold">Strategy:</p>
       {% for key, name in strategy_tickers_dict.items %}
       <button data-ticker="{{key}}" class="strategy-button border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded focus:outline-none hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">{{name}} ({{key}})</button>
       {% endfor %}
+    </div>
+  </div>
+  <hr>
+  <div class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4 mt-4">
+    <p class="font-bold">Watchlist:</p>
+    {% if watchlist_tickers %}
+        {% for ticker in watchlist_tickers %}
+            <div class="flex items-center space-x-2 border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">
+                <button data-ticker="{{ticker.ticker}}" class="strategy-button hover:border-none focus:outline-none">
+                    {{ticker.company_name}} ({{ticker.ticker}})
+                </button>
+                <!-- Ukryta forma -->
+                <form id="remove-ticker-{{ticker.ticker}}" action="{% url 'ticker_detail' ticker=ticker.ticker %}" method="post" class="focus:outline-none flex items-center">
+                    {% csrf_token %}
+                    <input type="hidden" name="remove_ticker" value="{{ticker.ticker}}">
+                    <button type="submit" class="focus:outline-none active:border-none" onclick="event.stopPropagation();"><img src="https://www.freeiconspng.com/uploads/close-button-png-27.png" width="20" alt="Remove" class="remove-ticker-icon"></button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Brak tickerów na watchliście.</p>
+    {% endif %}
+  </div>
+
+      {% comment %} {% for key, name in strategy_tickers_dict.items %}
+      <button data-ticker="{{key}}" class="strategy-button border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded focus:outline-none hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">{{name}} ({{key}})</button>
+      {% endfor %} {% endcomment %}
     </div>
   </div>
 
@@ -38,12 +68,33 @@
     {{ filter.form.as_p | safe }}
   </form>
 
+  <div id="purchase-container" class="container mx-auto px-4">
+    <form class="min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post">
+      {% csrf_token %}
+      <div>
+        <p id=form-ticker></p>
+          {{ form.ticker_symbol }}
+      </div>
+      <div>
+          {{ form.purchase_price }}
+      </div> 
+      <div>
+          <label for="id_quantity">Ilość:</label>
+          {{ form.quantity }}
+          {% if form.quantity.errors %}
+              <div class="error">{{ form.quantity.errors }}</div>
+          {% endif %}
+      </div>
+      <button type="submit">Dodaj/aktualizuj wpis</button>
+  </form>
+  </div>
 
   <div id="portfolio-display-container" class="container mx-auto px-4"></div>
 
-  <input type="text" name="ticker" value="{{ request.GET.ticker }}" />
+  <input type="text" name="ticker_price" value="{{ request.GET.ticker }}" />
   <script>
-    window.displayed_ticker = "{{ ticker|safe }}";
+    window.displayed_ticker = "{{ ticker|safe }}"
+    window.csrfToken = "{{ csrf_token }}";
   </script>
  
 

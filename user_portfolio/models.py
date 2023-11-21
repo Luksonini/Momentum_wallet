@@ -24,7 +24,7 @@ class MarketAnalysisPreferences(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s market analysis preferences"
-    
+
      
 class Portfolio(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -32,6 +32,7 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Portfolio"
+    
 
 class PortfolioEntry(models.Model):
     portfolio = models.ForeignKey(Portfolio, related_name='entries', on_delete=models.CASCADE)
@@ -50,3 +51,10 @@ class MappedTickers(models.Model):
 
     def __str__(self):
         return f"{self.ticker} - {self.company_name}"
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='watchlists')
+    tickers = models.ManyToManyField(MappedTickers, related_name='watchlists')
+
+    def __str__(self):
+        return f"{self.user.username}'s Watchlist"   
