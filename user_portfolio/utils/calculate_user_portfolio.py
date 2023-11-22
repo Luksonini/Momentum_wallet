@@ -1,6 +1,8 @@
 import yfinance as yf
-from ..models import Portfolio, MappedTickers
+from ..models import Portfolio, MappedTickers, PortfolioEntry
 from decimal import Decimal
+from django.utils import timezone
+
 
 class UserPortfolio_utils:
     def __init__(self, user, precision=2):
@@ -20,8 +22,6 @@ class UserPortfolio_utils:
         current_prices = self.fetch_current_prices()
         portfolio_info = {}
 
-       
-        
         for entry in self.entries:
             ticker = entry.ticker_symbol  # Use the ticker symbol from the entry
             ticker_modified = ticker.replace('-', '.') if '-' in ticker else ticker
@@ -34,7 +34,6 @@ class UserPortfolio_utils:
             value = quantity * current_price  # Now both are Decimal
             price_change = current_price - purchase_price
             percent_change = (price_change / purchase_price) * 100
-
 
 
             portfolio_info[ticker] = {
@@ -55,3 +54,40 @@ class UserPortfolio_utils:
 
     def calculate_total_value(self):
         return self.total_value + self.cash_left
+    
+
+    def add_ticker_to_portfolio(self, ticker_symbol, purchase_price, quantity):
+        # Sprawdź, czy ticker już istnieje w portfelu
+        existing_entry = self.entries.filter(ticker_symbol=ticker_symbol).first()
+
+        if existing_entry:
+            # Aktualizuj istniejący wpis
+            existing_entry.purchase_price = (existing_entry.purchase_price * existing_entry.quantity + purchase_price * quantity) / (existing_entry.quantity + quantity)
+            existing_entry.quantity += quantity
+            existing_entry.save()
+        else:
+            # Dodaj nowy wpis
+            new_entry = PortfolioEntry(
+                portfolio=self.portfolio,
+                ticker_symbol=ticker_symbol,
+                purchase_date=timezone.now(),  # Używamy bieżącej daty jako daty zakupu
+                purchase_price=purchase_price,
+                quantity=quantity
+            )
+            new_entry.save()
+
+        # Aktualizuj dostępną gotówkę
+        self.portfolio.available_cash -= purchase_price * quantity
+        self.portfolio.save()
+
+    def remove_ticker_from_portfolio(self, ticker_symbol):
+        # Znajdź wpis z podanym tickerem
+        entry_to_remove = self.entries.filter(ticker_symbol=ticker_symbol).first()
+
+        if entry_to_remove:
+            # Zwróć pieniądze do dostępnej gotówki
+            self.portfolio.available_cash += entry_to_remove.purchase_price * entry_to_remove.quantity
+            self.portfolio.save()
+            
+            # Usuń wpis
+            entry_to_remove.delete()

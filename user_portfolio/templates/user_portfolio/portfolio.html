@@ -13,7 +13,7 @@
     new TradingView.widget(
     {
     "autosize": true,
-    "symbol": `${window.displayed_ticker}`,
+    "symbol": `{{ticker}}`,
     "interval": "D",
     "timezone": "Etc/UTC",
     "theme": "light",
@@ -26,7 +26,6 @@
     );
     </script>
   </div>
-  to jest przekazany ticker {{ticker}}
   <hr>
   <div>
     <div class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4">
@@ -58,36 +57,44 @@
     {% endif %}
   </div>
 
-      {% comment %} {% for key, name in strategy_tickers_dict.items %}
-      <button data-ticker="{{key}}" class="strategy-button border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded focus:outline-none hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">{{name}} ({{key}})</button>
-      {% endfor %} {% endcomment %}
-    </div>
-  </div>
 
   <form method="get" class="min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow">
     {{ filter.form.as_p | safe }}
   </form>
 
-  <div id="purchase-container" class="container mx-auto px-4">
-    <form class="min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post">
-      {% csrf_token %}
-      <div>
-        <p id=form-ticker></p>
-          {{ form.ticker_symbol }}
+  <div id="purchase-container" class="container mx-auto px-4 ">
+    <form id="append-to-portfolio-form" class="relative min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post">
+        <!-- Token CSRF - możesz go dodać ręcznie lub wygenerować za pomocą skryptu JavaScript -->
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        
+        <div>
+          <p class="text-4xl font-bold" id="form-ticker"></p>
+          <p id="form-ticker-price"></p>
+          <!-- Ukryte pole dla symbolu tickera -->
+          <input type="hidden" name="ticker_symbol" id="id_ticker_symbol">
+        </div>
+        
+        <div>
+          <!-- Ukryte pole dla ceny zakupu -->
+          <input type="hidden" name="purchase_price" id="purchase_price">
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <label class='m-0' for="id_quantity">Shares:</label>
+            <!-- Pole tekstowe dla ilości akcji -->
+            <input type="number" name="quantity" id="quantity" 
+            class="mt-1 block w-full border-2 border-gray-300 bg-white py-2 px-4 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+            min="0.1" step="0.01" required>
+        </div>
+        
+        <!-- Element do wyświetlania całkowitej ceny -->
+        <p id="total-price"></p> 
+        <button id='buy-button' type="submit" class="absolute bottom-2 right-6 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Buy
+        </button>
       </div>
-      <div>
-          {{ form.purchase_price }}
-      </div> 
-      <div>
-          <label for="id_quantity">Ilość:</label>
-          {{ form.quantity }}
-          {% if form.quantity.errors %}
-              <div class="error">{{ form.quantity.errors }}</div>
-          {% endif %}
-      </div>
-      <button type="submit">Dodaj/aktualizuj wpis</button>
-  </form>
-  </div>
+    </form>
+</div>
 
   <div id="portfolio-display-container" class="container mx-auto px-4"></div>
 
@@ -95,6 +102,22 @@
   <script>
     window.displayed_ticker = "{{ ticker|safe }}"
     window.csrfToken = "{{ csrf_token }}";
+    window.currentPricePerShare = 0;
+    document.addEventListener('DOMContentLoaded', function() {
+      createPortfolioDisplay();
+      widgetOnTickerClick();
+      initializeTickerSuggestions();
+      handleAppendTickerToPortfolioForm();
+      createTradingViewWidget(window.displayed_ticker);
+      setInterval(function() {
+          createPortfolioDisplay();
+          var purchaseContainer = document.getElementById("purchase-container");
+          if (purchaseContainer && purchaseContainer.style.display === 'block') {
+          fetchTickerPrice(window.displayed_ticker);
+          }
+      }, 60000);
+      
+    });
   </script>
  
 

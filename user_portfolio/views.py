@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import StrategyInputForm, OptimisationPreferencesForm, PortfolioEntryForm
+from .forms import StrategyInputForm, OptimisationPreferencesForm
 from .models import User, UserStrategyModel, MarketAnalysisPreferences, MappedTickers, Portfolio, Watchlist
 from .utils.momentum import MarketAnalysis
 from .utils.calculate_weights import EqualWeightedPortfolio
@@ -163,13 +163,13 @@ def ticker_detail(request, ticker):
     watchlist_tickers = watchlist.tickers.all() if watchlist else []
 
     if request.method == 'POST':
-        form = PortfolioEntryForm(request.POST)
-        if form.is_valid():
-            portfolio_entry = form.save(commit=False)
-            portfolio_entry.portfolio = request.user.portfolio
-            portfolio_entry.save()
+        # form = PortfolioEntryForm(request.POST)
+        # if form.is_valid():
+        #     portfolio_entry = form.save(commit=False)
+        #     portfolio_entry.portfolio = request.user.portfolio
+        #     portfolio_entry.save()
 
-        elif 'ticker' in request.POST:
+        if 'ticker' in request.POST:
             ticker_adding_to_watchlist = request.POST.get('ticker')  
             if ticker_adding_to_watchlist:
                 watchlist_ticker = MappedTickers.objects.filter(ticker=ticker_adding_to_watchlist).first()
@@ -186,8 +186,7 @@ def ticker_detail(request, ticker):
                     watchlist = Watchlist.objects.get(user=request.user)
                     watchlist.tickers.remove(watchlist_ticker)
                     watchlist.save()
-    else:
-        form = PortfolioEntryForm()
+
 
     filter = MappedTickersFilter(request.GET, queryset=MappedTickers.objects.all())
 
@@ -196,7 +195,6 @@ def ticker_detail(request, ticker):
         'strategy_tickers_dict': company_names,
         'watchlist_tickers': watchlist_tickers,
         'filter': filter,
-        'form': form
     })
 
 
@@ -213,12 +211,24 @@ def ticker_suggestions(request):
 
     return JsonResponse(data, safe=False)
 
-
+from decimal import Decimal
 def user_portfolio_api(request):
+    'take the info about the tickers in portfolio or put new ones'
+    user_portfolio = UserPortfolio_utils(user=request.user)
+
     if request.method == 'GET':
-        user_portfolio = UserPortfolio_utils(user=request.user)
         portfolio_info = user_portfolio.get_portfolio_info()
-        return JsonResponse(portfolio_info)
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        ticker_symbol = data.get('ticker_symbol')
+        print(f"to jest ticker symbol {ticker_symbol}")
+        purchase_price = data.get('purchase_price')
+        print(f"to jest purchase price {purchase_price}")
+        quantity = data.get('quantity')
+        user_portfolio.add_ticker_to_portfolio(ticker_symbol, Decimal(purchase_price), int(quantity))
+        portfolio_info = user_portfolio.get_portfolio_info()
+
+    return JsonResponse(portfolio_info)
 
 import yfinance as yf
 def searching_ticker_value(request):
@@ -227,7 +237,10 @@ def searching_ticker_value(request):
         if ticker:
             try:
                 data = yf.download(ticker, period="1d")['Close'].iloc[-1]
-                return JsonResponse({'ticker': ticker, 'price': data})
+                user_portfolio = Portfolio.objects.get(user=request.user)
+                available_cash = user_portfolio.available_cash
+
+                return JsonResponse({'ticker': ticker, 'price': data, 'available_cash': available_cash})
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
         else:

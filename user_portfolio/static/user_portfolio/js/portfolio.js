@@ -92,9 +92,11 @@ function populatePortfolioData(data) {
             window.displayed_ticker = ticker;
             createTradingViewWidget(ticker);
             updateWatchlistFormActions(ticker);
+            fetchTickerPrice(ticker)
         });
     });
 }
+
 
 function updateWatchlistFormActions(ticker) {
   // Zakładając, że masz tylko jeden formularz do aktualizacji
@@ -155,33 +157,147 @@ function initializeTickerSuggestions() {
   });
 }
 
+/**
+ * Fetches the current price of a given ticker symbol from the API.
+ * On successful retrieval, updates the specified element in the DOM with the ticker's price.
+ * If an error occurs during the fetch operation or from the API, logs the error to the console.
+ *
+ * @param {string} ticker - The ticker symbol for which the price is being fetched.
+ */
+
 function fetchTickerPrice(ticker) {
   fetch(`/searching_ticker_value_api/?ticker=${ticker}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+        console.error('Error:', data.error);
+      } else {
+        let formPrice = document.getElementById('form-ticker-price');
+        let roundedPrice = parseFloat(data.price).toFixed(2);
+        formPrice.innerHTML = `Current price: $${roundedPrice}`;
+        const input_purchase_price = document.getElementById('purchase_price');
+        input_purchase_price.value = data.price;
+
+        let formTicker = document.getElementById('form-ticker');
+        formTicker.innerHTML = data.ticker;
+        const input_ticker_symbol = document.getElementById('id_ticker_symbol');
+        input_ticker_symbol.value = data.ticker;
+
+        window.availableCash = parseFloat(data.available_cash);
+
+        // Update the total price and add event listener for quantity change
+        let quantityInput = document.getElementById('quantity');
+        quantityInput.value = 0.1; // Set default quantity to 1
+        calculateTotalPrice(roundedPrice); // Calculate total price with the default quantity
+        quantityInput.addEventListener('input', function() {
+          calculateTotalPrice(roundedPrice);
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Fetch error:', error);
+    });
+}
+
+/**
+ * Calculates the total price of the purchase based on the price per share and the quantity.
+ * If the total price exceeds the available cash, it displays an alert and disables the submit button.
+ * @param {number} pricePerShare - The price per share of the stock.
+ */
+function calculateTotalPrice(pricePerShare) {
+  let quantityInput = document.getElementById('quantity');
+  let quantity = parseFloat(quantityInput.value);
+  let totalPrice = quantity * pricePerShare;
+  let totalPriceElement = document.getElementById('total-price');
+  totalPriceElement.innerHTML = `Total Price: $${totalPrice.toFixed(2)}`;
+
+  let purchaseContainer = document.getElementById('purchase-container');
+  let alertBox = document.getElementById('alert-box'); // Use getElementById to search for the alert box by id
+
+  let buyButton = document.getElementById('buy-button');
+
+  // Check if the total price exceeds the available cash
+  if (totalPrice > window.availableCash) {
+      // If alert box doesn't exist, create it
+      if (!alertBox) {
+          alertBox = document.createElement('div');
+          alertBox.id = 'alert-box'; // Assign a unique id to the alert box
+          alertBox.className = 'bg-red-500 text-white p-4 mt-4 rounded';
+          purchaseContainer.appendChild(alertBox);
+      }
+      // Update the alert box message
+      alertBox.textContent = `Warning: Purchase value exceeds available cash! Available amount: $${window.availableCash.toFixed(2)}`;
+
+      // Disable the 'Buy' button and change its style
+      buyButton.disabled = true;
+      buyButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+      buyButton.classList.remove('bg-green-500', 'hover:bg-green-700');
+  } else {
+      // If the alert box exists and the total price is less than available cash, remove the alert box
+      if (alertBox) {
+          alertBox.remove();
+      }
+      // Enable the 'Buy' button and reset its style
+      buyButton.disabled = false;
+      buyButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+      buyButton.classList.add('bg-green-500', 'hover:bg-green-700');
+  }
+}
+
+/**
+ * Handles the submission of the portfolio form.
+ * Gathers data from the form fields, sends it to the server via a POST request,
+ * and processes the server's response. It prevents the default form submission behavior,
+ * sends the form data as JSON, and handles the server's JSON response.
+ */
+function handleAppendTickerToPortfolioForm() {
+  console.log('I am trying to handle form')
+  const form = document.querySelector('#append-to-portfolio-form');
+  
+  form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Zbieranie danych z formularza
+      const formData = new FormData(form);
+      const data = {
+          'ticker_symbol': formData.get('ticker_symbol'),
+          'purchase_price': formData.get('purchase_price'),
+          'quantity': formData.get('quantity'),
+          'csrfmiddlewaretoken': formData.get('csrfmiddlewaretoken')  // Wartość tokena CSRF
+      };
+
+      // Wysyłanie danych do API
+      fetch('/user_portfolio_api/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': data.csrfmiddlewaretoken  // Wymagane dla Django CSRF
+          },
+          body: JSON.stringify(data)
+      })
       .then(response => {
           if (!response.ok) {
-              throw new Error('Network response was not ok');
+              throw new Error(`HTTP error! status: ${response.status}`);
           }
           return response.json();
       })
       .then(data => {
-          if (data.error) {
-              console.error('Error:', data.error);
-          } else {
-              console.log('Ticker Price:', data.price);
-              // Możesz tutaj zaktualizować interfejs użytkownika, wyświetlając cenę
-          }
+          console.log('Success:', data);
+          createPortfolioDisplay();
       })
       .catch(error => {
-          console.error('Fetch error:', error);
+          console.error('Error:', error);
       });
+  });
 }
 
 
-  document.addEventListener('DOMContentLoaded', function() {
-    createPortfolioDisplay();
-    widgetOnTickerClick();
-    initializeTickerSuggestions();
-    createTradingViewWidget(window.displayed_ticker) 
-    const formTickerName = document.getElementById('form-ticker')
-    formTickerName.innerHTML = window.displayed_ticker
-  });
+
+
+
+

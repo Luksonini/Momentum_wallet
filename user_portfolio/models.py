@@ -5,6 +5,7 @@ import pandas as pd
 # from django.core.serializers.json import DjangoJSONEncoder
 import datetime
 
+
 class User(AbstractUser):
     pass
 
