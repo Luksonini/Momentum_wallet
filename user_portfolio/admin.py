@@ -23,7 +23,7 @@ class PortfolioEntryInline(admin.TabularInline):
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('user', 'available_cash')
+    list_display = ('user', 'available_cash', 'initial_portfolio_value')
     search_fields = ('user__username',)
     inlines = [PortfolioEntryInline]
 

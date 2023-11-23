@@ -56,14 +56,23 @@
         <p>Brak tickerów na watchliście.</p>
     {% endif %}
   </div>
+  <div class="container max-w-8xl flex gap-5 justify-center mb-3">
+    <!-- Przycisk Buy Stock -->
+    <button id='buy-stock-display-button' class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" style='display: none;'>
+      Buy Stock
+    </button>
 
+    <!-- Przycisk Find Stock -->
+    <button class="bg-purple-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+      Find Stock
+    </button>
+</div>
 
-  <form method="get" class="min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow">
+  <form method="get" id="searching-form" class="min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow">
     {{ filter.form.as_p | safe }}
   </form>
-
-  <div id="purchase-container" class="container mx-auto px-4 ">
-    <form id="append-to-portfolio-form" class="relative min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post">
+  <div id="purchase-container" class="container mx-auto px-4 " style='display: none;'>
+    <form id="append-to-portfolio-form" class="relative min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post" >
         <!-- Token CSRF - możesz go dodać ręcznie lub wygenerować za pomocą skryptu JavaScript -->
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         

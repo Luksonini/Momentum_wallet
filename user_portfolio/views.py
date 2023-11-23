@@ -25,6 +25,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from .models import PortfolioEntry
 import json
+from decimal import Decimal
 # user_portfolio\utils
 # user_portfolio\views.py
 
@@ -163,12 +164,6 @@ def ticker_detail(request, ticker):
     watchlist_tickers = watchlist.tickers.all() if watchlist else []
 
     if request.method == 'POST':
-        # form = PortfolioEntryForm(request.POST)
-        # if form.is_valid():
-        #     portfolio_entry = form.save(commit=False)
-        #     portfolio_entry.portfolio = request.user.portfolio
-        #     portfolio_entry.save()
-
         if 'ticker' in request.POST:
             ticker_adding_to_watchlist = request.POST.get('ticker')  
             if ticker_adding_to_watchlist:
@@ -211,24 +206,34 @@ def ticker_suggestions(request):
 
     return JsonResponse(data, safe=False)
 
-from decimal import Decimal
 def user_portfolio_api(request):
-    'take the info about the tickers in portfolio or put new ones'
     user_portfolio = UserPortfolio_utils(user=request.user)
 
     if request.method == 'GET':
         portfolio_info = user_portfolio.get_portfolio_info()
+        performance_info = user_portfolio.calculate_portfolio_performance()
+        response_data = {
+            'portfolio_info': portfolio_info,
+            'performance_info': performance_info
+        }
     elif request.method == 'POST':
         data = json.loads(request.body)
-        ticker_symbol = data.get('ticker_symbol')
-        print(f"to jest ticker symbol {ticker_symbol}")
-        purchase_price = data.get('purchase_price')
-        print(f"to jest purchase price {purchase_price}")
-        quantity = data.get('quantity')
-        user_portfolio.add_ticker_to_portfolio(ticker_symbol, Decimal(purchase_price), int(quantity))
-        portfolio_info = user_portfolio.get_portfolio_info()
+        if 'sell_ticker' not in data:
+            ticker_symbol = data.get('ticker_symbol')
+            purchase_price = data.get('purchase_price')
+            quantity = data.get('quantity')
+            user_portfolio.add_ticker_to_portfolio(ticker_symbol, Decimal(purchase_price), Decimal(quantity))
+        else:
+            user_portfolio.remove_ticker_from_portfolio(ticker_symbol=data['sell_ticker'], current_price=Decimal(data['price']))
 
-    return JsonResponse(portfolio_info)
+        portfolio_info = user_portfolio.get_portfolio_info()
+        performance_info = user_portfolio.calculate_portfolio_performance()
+        response_data = {
+            'portfolio_info': portfolio_info,
+            'performance_info': performance_info
+        }
+
+    return JsonResponse(response_data)
 
 import yfinance as yf
 def searching_ticker_value(request):

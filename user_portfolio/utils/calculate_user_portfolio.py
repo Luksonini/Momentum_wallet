@@ -2,6 +2,8 @@ import yfinance as yf
 from ..models import Portfolio, MappedTickers, PortfolioEntry
 from decimal import Decimal
 from django.utils import timezone
+import pandas as pd
+import numpy as np
 
 
 class UserPortfolio_utils:
@@ -15,9 +17,30 @@ class UserPortfolio_utils:
 
     def fetch_current_prices(self):
         tickers = [entry.ticker_symbol for entry in self.entries]
-        data = yf.download(tickers, period="1d")['Close'].iloc[-1]
-        return data.to_dict()
 
+        # Jeśli lista tickerów jest pusta, zwróć pusty słownik
+        if not tickers:
+            return {}
+
+        data = yf.download(tickers, period="1d")['Close'].iloc[-1]
+
+        # Kontynuuj z resztą logiki, jak wcześniej opisano
+        if isinstance(data, (float, np.float64)):
+            return {tickers[0]: data}
+        else:
+            return data.to_dict()
+
+    def calculate_portfolio_performance(self):
+        current_value = self.calculate_total_value()
+        initial_value = self.portfolio.initial_portfolio_value
+        percent_change = ((current_value - initial_value) / initial_value) * 100 if initial_value != 0 else 0
+        return {
+            'balance': round(current_value, self.precision),
+            'available_cash': round(self.cash_left, self.precision),
+            'initial_portfolio_value': round(initial_value, self.precision),
+            'percent_change': round(percent_change, self.precision)
+        }
+    
     def get_portfolio_info(self):
         current_prices = self.fetch_current_prices()
         portfolio_info = {}
@@ -80,13 +103,13 @@ class UserPortfolio_utils:
         self.portfolio.available_cash -= purchase_price * quantity
         self.portfolio.save()
 
-    def remove_ticker_from_portfolio(self, ticker_symbol):
+    def remove_ticker_from_portfolio(self, ticker_symbol, current_price):
         # Znajdź wpis z podanym tickerem
         entry_to_remove = self.entries.filter(ticker_symbol=ticker_symbol).first()
 
         if entry_to_remove:
             # Zwróć pieniądze do dostępnej gotówki
-            self.portfolio.available_cash += entry_to_remove.purchase_price * entry_to_remove.quantity
+            self.portfolio.available_cash += current_price * entry_to_remove.quantity
             self.portfolio.save()
             
             # Usuń wpis

@@ -1,62 +1,162 @@
-function populatePortfolioData(data) {
-    console.log(data)  
-    const container = document.getElementById('portfolio-display-container');
-    container.innerHTML = ''; // Wyczyść kontener przed dodaniem nowych elementów
-  
-    // Tworzenie nagłówków
-    const headers = ['Company Info', 'Quantity', 'Purchase Price', 'Current Price', 'Value', 'Price Change', 'Percent Change'];
-    const headerDiv = document.createElement('div');
-    headerDiv.className = 'grid grid-cols-7 text-center bg-gray-200 p-2'; // Stylizacja nagłówka
-    headers.forEach(headerText => {
+/**
+ * Populates portfolio data into the HTML container.
+ * Creates a grid layout displaying each stock's information along with a 'Sell' button.
+ * @param {Object} data - The portfolio data object containing stock information.
+ */
+function populatePortfolioData(responseData) {
+  console.log(responseData);
+  const container = document.getElementById('portfolio-display-container');
+  container.innerHTML = ''; // Clear the container before adding new elements
+
+  // Creating headers
+  const headers = ['Company Info', 'Quantity', 'Purchase Price', 'Current Price', 'Value', 'Price Change', 'Percent Change', 'Action'];
+  const headerDiv = document.createElement('div');
+  headerDiv.className = 'grid grid-cols-8 text-center bg-gray-200 p-2'; // Styling the header
+  headers.forEach(headerText => {
       const header = document.createElement('div');
       header.textContent = headerText;
-      header.className = 'col-span-1'; // Dostosuj rozpiętość według potrzeb
+      header.className = 'col-span-1'; // Adjust span as needed
       headerDiv.appendChild(header);
-    });
-    container.appendChild(headerDiv);
-  
-    // Iteracja po każdym wpisie w obiekcie danych
-    Object.entries(data).forEach(([ticker, info]) => {
+  });
+  container.appendChild(headerDiv);
+
+  // Iterating over each entry in the data object
+  const portfolioData = responseData.portfolio_info;
+  Object.entries(portfolioData).forEach(([ticker, info]) => {
       const rowDiv = document.createElement('div');
-      rowDiv.className = 'grid grid-cols-7 text-center p-2 hover:bg-gray-100';// Stylizacja wiersza
-        rowDiv.onclick = function() {
-          // Zamiana '-' na '.' jeśli '-' występuje w ticker
-          ticker = ticker.replace(/-/g, '.');
-          window.displayed_ticker = ticker
-          createTradingViewWidget(ticker);
-          
-      };
-      // Kolumna z informacjami o firmie (ticker, nazwa firmy)
+      rowDiv.className = 'grid grid-cols-8 text-center p-2 hover:bg-gray-100'; // Styling the row
+
+      // Column with company info (ticker, company name)
       const companyInfoDiv = document.createElement('div');
-      companyInfoDiv.className = 'text-left'; // Stylizacja
+      companyInfoDiv.className = 'col-span-1 text-left'; // Styling
       const companyName = document.createElement('div');
       companyName.textContent = `${info.company_name} (${ticker})`;
-      companyName.className = 'company-info-class'; // Dodaj swoją klasę CSS
+      companyName.className = 'company-info-class'; // Add your custom CSS class
       companyInfoDiv.appendChild(companyName);
       rowDiv.appendChild(companyInfoDiv);
-  
-      // Reszta danych
-      headers.slice(1).forEach(header => {
-        const cellDiv = document.createElement('div');
 
-        let textContent = info[header.toLowerCase().replace(/ /g, '_')];
-  
-        if (typeof textContent === 'number') {
-          textContent = textContent.toFixed(2) + '$';
-        }
-  
-        cellDiv.textContent = textContent;
-        cellDiv.className = 'col-span-1';
-        if (header === 'Price Change' || header === 'Percent Change') {
-          cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
-        }
-  
-        rowDiv.appendChild(cellDiv);
+      // Rest of the data
+      headers.slice(1, -1).forEach(header => { // Skip the last 'Action' header
+          const cellDiv = document.createElement('div');
+          let textContent = info[header.toLowerCase().replace(/ /g, '_')];
+          if (typeof textContent === 'number') {
+              textContent = textContent.toFixed(2) + '$';
+          }
+          cellDiv.textContent = textContent;
+          cellDiv.className = 'col-span-1';
+          if (header === 'Price Change' || header === 'Percent Change') {
+              cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
+          }
+          rowDiv.appendChild(cellDiv);
       });
-      
-      container.appendChild(rowDiv);
-    });
-  }
+
+          // Adding the 'Action' column with a 'Sell' button
+          const actionCellDiv = document.createElement('div');
+          actionCellDiv.className = 'col-span-1';
+          const sellButton = document.createElement('button');
+          sellButton.value = ticker;
+          sellButton.name = 'sell';
+          sellButton.setAttribute('data-ticker', ticker); 
+          sellButton.setAttribute('data-current-price', info.current_price); 
+          sellButton.textContent = 'Sell';
+          sellButton.className = 'sell-button bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded'; // Tailwind CSS for button
+          sellButton.onclick = () => handleSellTicker(sellButton);
+          actionCellDiv.appendChild(sellButton);
+          rowDiv.appendChild(actionCellDiv);
+
+          container.appendChild(rowDiv);
+      });
+
+      // Add performance data at the bottom
+      const performanceInfo = responseData.performance_info;
+      if (performanceInfo) {
+        const performanceDiv = document.createElement('div');
+        performanceDiv.className = 'flex justify-between performance-info mt-2 p-2 bg-gray-200'; // Tailwind CSS dla stylizacji
+    
+        // Używając parseFloat, przekształć string na liczbę i użyj .toFixed(2) dla zaokrąglenia
+        const balanceDiv = createPerformanceDetail('Total Balance', `$${parseFloat(performanceInfo.balance).toFixed(2)}`);
+        balanceDiv.className = 'pl-5'
+        const availableCashDiv = createPerformanceDetail('Available Cash', `$${parseFloat(performanceInfo.available_cash).toFixed(2)}`);
+        const initialValueDiv = createPerformanceDetail('Initial Portfolio Value', `$${parseFloat(performanceInfo.initial_portfolio_value).toFixed(2)}`);
+        const percentChangeDiv = createPerformanceDetail('Gain', `${parseFloat(performanceInfo.percent_change).toFixed(2)}%`);
+        percentChangeDiv.className = 'pr-5'
+
+        performanceDiv.appendChild(balanceDiv);
+        performanceDiv.appendChild(availableCashDiv);
+        performanceDiv.appendChild(initialValueDiv);
+        performanceDiv.appendChild(percentChangeDiv);
+    
+        container.appendChild(performanceDiv);
+      }
+    }
+
+function createPerformanceDetail(label, value) {
+  const detailDiv = document.createElement('div');
+  detailDiv.className = 'performance-detail'; // Add any necessary CSS classes
+
+  const labelSpan = document.createElement('span');
+  labelSpan.textContent = `${label}: `;
+  detailDiv.appendChild(labelSpan);
+
+  const valueSpan = document.createElement('span');
+  valueSpan.textContent = value;
+  detailDiv.appendChild(valueSpan);
+
+  return detailDiv;
+}
+
+function createPortfolioDisplay() {
+  fetch('/user_portfolio_api/')
+      .then(response => {
+          if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+      })
+      .then(data => populatePortfolioData(data))
+      .catch(error => console.error('Could not fetch portfolio data:', error));
+}
+
+/**
+ * Handles the selling of a ticker.
+ * Sends a POST request to the server with the ticker symbol to be sold.
+ * @param {string} ticker - The ticker symbol of the stock to be sold.
+ */
+function handleSellTicker(button) {
+  const ticker = button.getAttribute('data-ticker');
+  const currentPrice = button.getAttribute('data-current-price')
+  const data = {
+    'sell_ticker': ticker, // The ticker symbol to sell
+    'price': currentPrice // Current price of the ticker
+  };
+
+  // Sending the data to the server using the fetch API
+  fetch('/user_portfolio_api/', { 
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': window.csrfToken // CSRF token for Django security
+      },
+      body: JSON.stringify(data) // Sending the data as a JSON string
+  })
+  .then(response => {
+      if (!response.ok) {
+          // If the server response is not OK, throw an error
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json(); // Parsing the JSON response from the server
+  })
+  .then(data => {
+      console.log('Success:', data); // Logging the success data
+      // Update the UI after successful sell
+      createPortfolioDisplay(); // Assuming this function refreshes the portfolio display
+  })
+  .catch(error => {
+      // Logging any errors to the console
+      console.error('Error:', error);
+  });
+}
+
 
   function createTradingViewWidget(ticker) {
     // Najpierw usuń istniejący widżet, jeśli istnieje
@@ -78,17 +178,14 @@ function populatePortfolioData(data) {
     });
 }
   
-  function createPortfolioDisplay() {
-    fetch('/user_portfolio_api/')
-        .then(response => response.json())
-        .then(data => populatePortfolioData(data))
-        .catch(error => console.error('Could not fetch portfolio data:', error));
-  }
+
 
   function widgetOnTickerClick() {
     document.querySelectorAll('.strategy-button').forEach(button => {
         button.addEventListener('click', function() {
             const ticker = this.getAttribute('data-ticker').replace(/-/g, '.');
+            document.getElementById('purchase-container').style.display = 'none';
+            changeFormDisplayButton(ticker);
             window.displayed_ticker = ticker;
             createTradingViewWidget(ticker);
             updateWatchlistFormActions(ticker);
@@ -96,6 +193,27 @@ function populatePortfolioData(data) {
         });
     });
 }
+
+function changeFormDisplayButton(ticker) {
+  const buyStockDisplayButton = document.getElementById('buy-stock-display-button');
+  const purchaseContainer = document.getElementById('purchase-container');
+
+  // Upewnij się, że przycisk "Buy" jest widoczny
+  buyStockDisplayButton.style.display = 'block';
+  
+  // Ustaw tekst przycisku "Buy" na podstawie tickera
+  buyStockDisplayButton.innerHTML = `Buy ${ticker}`;
+
+  // Ustaw zdarzenie onclick na przycisku, aby pokazać kontener zakupu
+  buyStockDisplayButton.onclick = function () {
+    // Pokaż kontener zakupu jeśli był ukryty
+    if (purchaseContainer.style.display === 'none') {
+      purchaseContainer.style.display = 'block';
+      buyStockDisplayButton.style.display = 'none';
+    }
+  }
+}
+
 
 
 function updateWatchlistFormActions(ticker) {
@@ -256,7 +374,6 @@ function calculateTotalPrice(pricePerShare) {
  * sends the form data as JSON, and handles the server's JSON response.
  */
 function handleAppendTickerToPortfolioForm() {
-  console.log('I am trying to handle form')
   const form = document.querySelector('#append-to-portfolio-form');
   
   form.addEventListener('submit', function(event) {
@@ -288,6 +405,7 @@ function handleAppendTickerToPortfolioForm() {
       })
       .then(data => {
           console.log('Success:', data);
+          document.getElementById('purchase-container').style.display = 'none';
           createPortfolioDisplay();
       })
       .catch(error => {
@@ -295,9 +413,6 @@ function handleAppendTickerToPortfolioForm() {
       });
   });
 }
-
-
-
 
 
 

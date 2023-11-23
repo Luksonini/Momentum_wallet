@@ -30,6 +30,7 @@ class MarketAnalysisPreferences(models.Model):
 class Portfolio(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     available_cash = models.DecimalField(max_digits=10, decimal_places=2)
+    initial_portfolio_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return f"{self.user.username}'s Portfolio"
