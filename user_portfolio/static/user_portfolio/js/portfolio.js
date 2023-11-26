@@ -12,7 +12,7 @@ function populatePortfolioData(responseData) {
   // Creating headers
   const headers = ['Company Info', 'Quantity', 'Purchase Price', 'Current Price', 'Value', 'Price Change', 'Percent Change', 'Action'];
   const headerDiv = document.createElement('div');
-  headerDiv.className = 'grid grid-cols-8 text-center bg-gray-200 p-2'; // Styling the header
+  headerDiv.className = 'grid grid-cols-8 text-center bg-[#25174B] text-[#e9e7ed] p-2 font-semibold'; // Styling the header
   headers.forEach(headerText => {
       const header = document.createElement('div');
       header.textContent = headerText;
@@ -25,7 +25,7 @@ function populatePortfolioData(responseData) {
   const portfolioData = responseData.portfolio_info;
   Object.entries(portfolioData).forEach(([ticker, info]) => {
       const rowDiv = document.createElement('div');
-      rowDiv.className = 'grid grid-cols-8 text-center p-2 hover:bg-gray-100'; // Styling the row
+      rowDiv.className = 'grid grid-cols-8 text-center p-2 hover:bg-gray-100 font-semibold'; // Styling the row
 
       // Column with company info (ticker, company name)
       const companyInfoDiv = document.createElement('div');
@@ -60,7 +60,7 @@ function populatePortfolioData(responseData) {
           sellButton.setAttribute('data-ticker', ticker); 
           sellButton.setAttribute('data-current-price', info.current_price); 
           sellButton.textContent = 'Sell';
-          sellButton.className = 'sell-button bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded'; // Tailwind CSS for button
+          sellButton.className = 'sell-button bg-[#a28834] text-white hover:bg-[#796832] text-white py-1 px-3 rounded'; // Tailwind CSS for button
           sellButton.onclick = () => handleSellTicker(sellButton);
           actionCellDiv.appendChild(sellButton);
           rowDiv.appendChild(actionCellDiv);
@@ -72,7 +72,7 @@ function populatePortfolioData(responseData) {
       const performanceInfo = responseData.performance_info;
       if (performanceInfo) {
         const performanceDiv = document.createElement('div');
-        performanceDiv.className = 'flex justify-between performance-info mt-2 p-2 bg-gray-200'; // Tailwind CSS dla stylizacji
+        performanceDiv.className = 'flex justify-between performance-info mt-2 p-2 bg-[#25174B] text-[#D1D5DB]'; // Tailwind CSS dla stylizacji
     
         // Use parseFloat to convert string to number and .toFixed(2) for rounding
         const balanceDiv = createPerformanceDetail('Total Balance', `$${parseFloat(performanceInfo.balance).toFixed(2)}`);

@@ -6,7 +6,7 @@
 {% block body %}
 
 <!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container container max-w-8xl" style="height: 750px;">
+  <div class="tradingview-widget-container mx-auto w-full md:max-w-8xl mt-10" style="height: 750px;">
     <div id="tradingview_d7bdc" style="height:calc(100% - 32px);width:100%"></div>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
@@ -26,28 +26,29 @@
     );
     </script>
   </div>
-  <hr>
-  <div>
-    <div class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4">
+  <hr class="w-3/4 mx-auto border-2 border-[#25174B]">
+  <div class="mt-4">
+    <div class="flex flex-wrap gap-2 max-w-8xl mx-auto pb-4 px-[180px]">
       <p class="font-bold">Strategy:</p>
       {% for key, name in strategy_tickers_dict.items %}
-      <button data-ticker="{{key}}" class="strategy-button border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded focus:outline-none hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">{{name}} ({{key}})</button>
+      <button data-ticker="{{key}}" class="strategy-button border border-gray-300 shadow-sm bg-[#25174B] text-[#e9e7ed] font-semibold pl-2 px-4 rounded hover:bg-[#50456e] hover:border-gray-400 hover:shadow-md transition-all duration-200">{{name}} ({{key}})</button>
       {% endfor %}
     </div>
   </div>
-  <hr>
+  <hr class="w-3/4 mx-auto border-2 border-[#25174B]">
 
-  <div id = "watchlist-container" class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4 mt-4">
+  <div id = "watchlist-container" class="flex flex-wrap gap-2 max-w-8xl mx-auto pb-4 px-[180px] mt-4">
     <p class="font-bold">Watchlist:</p>
     {% if watchlist_tickers %}
         {% for ticker in watchlist_tickers %}
-            <div data-ticker-id="{{ ticker.ticker }}" class="flex items-center space-x-2 border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">
+            <div data-ticker-id="{{ ticker.ticker }}" class="flex items-center space-x-2 border border-gray-300 shadow-sm bg-[#25174B] text-[#e9e7ed] font-semibold pl-2 px-4 rounded hover:bg-[#50456e] hover:border-gray-400 hover:shadow-md transition-all duration-200">
                 <button data-ticker="{{ ticker.ticker }}" class="strategy-button hover:border-none focus:outline-none">
                     {{ ticker.company_name }} ({{ ticker.ticker }})
                 </button>
                 <!-- Przycisk do usuwania tickeru -->
                 <button data-ticker="{{ ticker.ticker }}" onclick="manageWatchlistTicker('remove', '{{ticker.ticker}}')" class="remove-ticker-button focus:outline-none active:border-none">
-                    <img src="https://www.freeiconspng.com/uploads/close-button-png-27.png" width="20" alt="Remove" class="remove-ticker-icon">
+                    <img src="{% static 'user_portfolio/images/close-icon.png' %}"  width="20" alt="Remove" class="remove-ticker-icon">
+                    
                 </button>
             </div>
         {% endfor %}
@@ -57,12 +58,12 @@
 </div>
   <div class="container max-w-8xl flex gap-5 justify-center mb-3">
     <!-- Przycisk Buy Stock -->
-    <button id='buy-stock-display-button' class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" style='display: none;'>
+    <button id='buy-stock-display-button' class="bg-[#a28834] text-white hover:bg-[#796832] font-bold uppercase text-md px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" style='display: none;'>
       Buy Stock
     </button>
 
     <!-- Przycisk Find Stock -->
-    <button id = 'find-stock' class="bg-purple-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+    <button id = 'find-stock' class="bg-[#a28834] text-white hover:bg-[#796832] font-bold uppercase text-md px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
       Find Stock
     </button>
 </div>
@@ -71,6 +72,7 @@
     {{ filter.form.as_p | safe }}
   </form>
   <div id="purchase-container" class="container mx-auto px-4 " style='display: none;'>
+
     <form id="append-to-portfolio-form" class="relative min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post" >
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         

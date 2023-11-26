@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from .forms import StrategyInputForm, OptimisationPreferencesForm
 from .models import User, UserStrategyModel, MarketAnalysisPreferences, MappedTickers, Portfolio, Watchlist
@@ -12,25 +12,20 @@ from .utils.calculate_weights import EqualWeightedPortfolio
 from .utils.calculate_user_portfolio import UserPortfolio_utils
 from django.http import JsonResponse
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from .filters import MappedTickersFilter
 from django.db.models import Q
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework import status
-# from .serializesrs import PortfolioEntrySerializer, PortfolioSerializer
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ValidationError
-from .models import PortfolioEntry
 import json
 from decimal import Decimal
-# user_portfolio\utils
-# user_portfolio\views.py
+
+
+def index(request):
+    return render(request, "user_portfolio/index.html")
+
 
 @login_required(login_url='login')
-def index(request):
+def momentum(request):
     strategy_form = StrategyInputForm(request.POST or None)
     optimisation_form = OptimisationPreferencesForm(request.POST or None)
     user_strategy_model = UserStrategyModel.objects.filter(user=request.user).first()

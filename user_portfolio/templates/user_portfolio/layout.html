@@ -6,7 +6,7 @@
         <title>{% block title %}Social Network{% endblock %}</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'user_portfolio/style.css' %}">
+        <link rel="stylesheet" href="{% static 'user_portfolio/index.css' %}">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
         <script src="https://cdn.tailwindcss.com"></script>
         
@@ -14,43 +14,46 @@
         
         {% endblock scripts %}
     </head>
-    <body style="font-family: 'Montserrat', sans-serif;">
-      <nav class="bg-gray-800 bg-opacity-80 shadow-md pb-2 pt-2">
-        <div class="flex items-center justify-center gap-5 px-4">
+    <body class="text-2xl" style="font-family: 'Montserrat', sans-serif;">
+      <nav class="bg-[#25174B] shadow-md pb-2 pt-2 text-4xl">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-5 px-4">
           <!-- Left Side Links -->
-          <ul class="flex">
+          <ul class="flex flex-col sm:flex-row flex-1 justify-end gap-10">
             <!-- Your left side links go here -->
             <li>
-              <a href="{% url 'index' %}" class="text-gray-100 font-semibold uppercase tracking-widest text-sm hover:text-gray-300">Main Page</a>
+              <a href="{% url 'index' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Main Page</a>
+            </li>
+            <li>
+              <a href="{% url 'momentum' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Momentum</a>
             </li>
           </ul>
       
           <!-- Center Logo -->
-          <div class="flex-shrink-0">
-            <img class="block h-[200px]" src="{% static 'user_portfolio/capy3wobg_c.png' %}" alt="Capybara">
+          <div class="flex-0 hidden sm:block">
+            <img class="block h-[200px]" src="{% static 'user_portfolio/images/capy3wobg_c.png' %}" alt="Capybara">
           </div>
       
           <!-- Right Side Links -->
-          <ul class="flex gap-5">
+          <ul class="flex flex-col sm:flex-row flex-1 gap-10">
             <!-- Your right side links go here -->
+            <li>
+              <a href="{% url 'ticker_detail' ticker='AAPL' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Portfolio</a>
+            </li>
             {% if user.is_authenticated %}
               <li>
-                <a href="#" class="text-gray-100 font-semibold uppercase tracking-widest text-sm hover:text-gray-300">{{ user.username }}</a>
-              </li>
-              <li>
-                <a href="{% url 'logout' %}" class="text-gray-100 font-semibold uppercase tracking-widest text-sm hover:text-gray-300">Log Out</a>
+                <a href="{% url 'logout' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Log Out</a>
               </li>
             {% else %}
               <li>
-                <a href="{% url 'ticker_detail' %}" class="text-gray-100 font-semibold uppercase tracking-widest text-sm hover:text-gray-300">Log In</a>
+                <a href="{% url 'ticker_detail' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Log In</a>
               </li>
               <li>
-                <a href="{% url 'register' %}" class="text-gray-100 font-semibold uppercase tracking-widest text-sm hover:text-gray-300">Register</a>
+                <a href="{% url 'register' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Register</a>
               </li>
             {% endif %}
           </ul>
         </div>
-      </nav>
+    </nav>
         
         <div class="body">
             {% block body %}

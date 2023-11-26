@@ -1,0 +1,83 @@
+{% extends "user_portfolio/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <section class="section-heroe">
+        <div class="heroe">
+            <div class="heroe-text-box">
+                <h1 class="heading-primary">
+                    Invest with Momentum: Build a Stronger Portfolio
+                </h1>
+                <p class="heroe-description">
+                    At Invest with Momentum, we believe that everyone should have access
+                    to high-quality investment advice. That's why we offer affordable
+                    solutions that help you achieve your financial goals.
+                </p>
+                <a href="{% url 'momentum' %}" class="btn">Start Building Your Portfolio</a>
+            </div>
+            <div class="heroe-image-box">
+                <img
+                    class="heroe-img"
+                    src="{% static 'user_portfolio/images/heroe.png' %}"
+                    alt="The graphics of the people happy from growing investment incomes"
+                />
+                <div class="heroe-logos">
+                    <img src="{% static 'user_portfolio/images/NYSE.png' %}" alt="NYSE Logo" />
+                    <img src="{% static 'user_portfolio/images/GPW.png' %}" alt="GPW Logo" />
+                    <img src="{% static 'user_portfolio/images/binance.png' %}" alt="Binance Logo" />
+                </div>
+            </div>
+        </div>
+    {% comment %} </section>
+    <section class="space-y-8 ">
+      <div class="flex flex-row items-center justify-center space-x-4 ">
+        <div class="w-48">
+          <img src="{% static 'user_portfolio/images/waren_sk.jpg' %}" alt="Warren Buffett" class="rounded-full" />
+        </div>
+        <div>
+          <p class="text-lg">
+            "The stock market is a device for transferring money from the impatient to the patient."
+          </p>
+          <p class="font-bold">
+            Warren Buffett
+          </p>
+        </div>
+      </div>
+      
+      <div class="flex flex-row items-center justify-center space-x-4">
+        <div class="w-48">
+          <img src="{% static 'user_portfolio/images/Livermore.png' %}" alt="Jesse Livermore" class="rounded-full" />
+        </div>
+        <div>
+          <p class="text-lg">
+            "The trend is your friend until it ends."
+          </p>
+          <p class="font-bold">
+            Jesse Livermore
+          </p>
+        </div>
+      </div>
+    </section> {% endcomment %}
+{% endblock %}
+
+
+
+<!-- "The trend is your friend until it ends." - Jesse Livermore
+
+"The stock market is a device for transferring money from the impatient to the patient." - Warren Buffett
+
+"I always laugh at people who say, 'I've never met a rich technician.' I love that! It's such an arrogant, nonsensical response. I used fundamentals for nine years and got rich as a technician." - Marty Schwartz
+
+"The market can stay irrational longer than you can stay solvent." - John Maynard Keynes
+
+"The most important thing in investing is to avoid losing money. The second most important thing is to not forget the first rule." - Warren Buffett
+
+"It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong." - George Soros
+
+"I buy on the assumption that they could close the market the next day and not reopen it for five years." - Warren Buffett
+
+"Successful investing is about managing risk, not avoiding it." - Benjamin Graham
+
+"The four most dangerous words in investing are: 'this time it's different.'" - Sir John Templeton
+
+"Price is what you pay. Value is what you get." - Warren Buffett -->

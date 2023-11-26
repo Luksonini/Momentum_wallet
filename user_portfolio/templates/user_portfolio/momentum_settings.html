@@ -1,7 +1,7 @@
 {% extends "user_portfolio/layout.html" %}
 {% load static %}
 {% block body %}
-    <div class="w-full  max-w-xl mx-auto my-8 flex flex-col items-center text-center">
+    <div class="w-full max-w-2xl mx-auto my-8 flex flex-col items-center text-center text-2xl">
         <div class="w-full mx-auto">
             <p class="font-bold">Your current strategy parameters:</p>
             <p>You are searching for the top <span id="user-preferences-nlargest" class="font-bold">{{ user_preferences.nlargest_window }}</span> 
@@ -12,7 +12,7 @@
     </div> 
     
         <!-- Strategy Form -->
-    <div class="w-full max-w-xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
+    <div class="w-full max-w-4xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg text-2xl">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Custom Strategy Parameters</h2>
         <form id="strategy-form" method="post" class="md:flex md:items-center md:justify-between md:gap-4">
             {% csrf_token %}
@@ -52,12 +52,12 @@
         </form>
     </div>
         <!-- Strategy Form -->
-    <div class="w-full max-w-xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
+    <div class="w-full max-w-4xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg text-2xl">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Optimize Your Strategy</h2>
         <form id="optimisation-form" method="post" class="md:flex md:items-center md:justify-between md:gap-4">
             {% csrf_token %}
             <!-- datefield field -->
-            <div class="mb-4 md:mb-0 w-full text-center">
+            <div class="mb-4 md:mb-0 w-full text-center ">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="start-date-input">
                     {{ optimisation_form.optimisation_date.label }}
                 </label>
@@ -96,13 +96,14 @@
     </div>
 
     <div id="charts-wrapper" class="flex flex-wrap w-full max-w-6xl mx-auto items-center">
-        <div id="chart-container" class="w-full max-w-2xl mx-auto mt-8 mb-4">
-            <canvas id="myChart" class="w-full"></canvas>
+        <div id="chart-container" class="w-full max-w-2xl mx-auto">
+            <canvas id="myChart" class="w-full h-full" style="width:600px; height:400px;" wstyle="display: block;"></canvas>
         </div>
-        
-        <div id="pie-chart-container" class="flex flex-column items-center w-full max-w-xs mx-auto mt-8 mb-4">
-            <p id="stocks-date"></p>
-            <canvas id="myPieChart" class="w-full h-50"></canvas>
+    </div>
+    <div id="charts-wrapper" class="flex flex-wrap w-full max-w-6xl mx-auto items-center ">
+        <div id="pie-chart-container" class="mx-auto">
+            <p class="text-xl font-bold text-center" id="stocks-date"></p>
+            <canvas id="myPieChart" class="w-full" height="420" style="display: block;"></canvas>
         </div>
     </div>
 

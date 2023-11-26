@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("momentum/", views.momentum, name="momentum"),
     path("chart-data/", views.chart_data, name="chart_data"),
     path('optimisation-data/', views.optimisation_view, name='optimisation_data'),
     path("login", views.login_view, name="login"),
@@ -14,7 +15,6 @@ urlpatterns = [
     path('tickers_info/', views.tickers_info),
     path('ticker_detail/<str:ticker>/', views.ticker_detail, name='ticker_detail'),
     path('user_portfolio_api/', views.user_portfolio_api, name='ticker_detail'),
-    # path('user_portfolio_api/', views.PortfolioAPIView.as_view(), name='portfolio-api'),
     path('ticker_search_suggestions/', views.ticker_suggestions, name='ticker_suggestions'),
     path('searching_ticker_value_api/', views.searching_ticker_value, name='ticker_suggestions'),
     path('manage_watchlist/', views.manage_watchlist, name='manage_watchlist'),
