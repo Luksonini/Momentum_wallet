@@ -6,15 +6,15 @@ This Django-based investment application enables users to manage their investmen
 
 ## Key Features
 
-- **User Authentication:** Secure login, logout, and user registration.
-- **Strategy Management:** Input and automatic generation of investment strategies based on user preferences.
-- **Market Analysis:** Historical data analysis to generate portfolio recommendations.
-- **Strategy Optimization:** Parameter optimization features for maximizing investment returns.
-- **Portfolio Management:** Create and adjust an equally-weighted investment portfolio.
-- **User Interaction:** Dynamic charts and data presentation for strategy performance comparison.
-- **Watchlist Management:** Add and remove tickers from a personalized watchlist.
-- **Ticker Suggestions:** Auto-suggestions for tickers during searches for ease of adding to portfolios or watchlists.
-- **User Portfolio API:** Provides portfolio information, including performance and detailed entries.
+- **User Authentication:** Secure login, logout, and user registration with Django's built-in mechanisms.
+- **Strategy Management:** Users can input their investment preferences and automatically generate investment strategies.
+- **Market Analysis:** Utilizes historical market data to generate portfolio recommendations.
+- **Strategy Optimization:** Employs parameter optimization to maximize investment returns using the `scipy.optimize` algorithm.
+- **Portfolio Management:** Users can create and adjust an equally-weighted investment portfolio.
+- **User Interaction:** Interactive charts and data provide insights into strategy performance compared to benchmarks like the S&P 500 index.
+- **Watchlist Management:** Enables users to add and remove tickers from a personal watchlist.
+- **Ticker Suggestions:** Offers auto-suggestions for ticker symbols to aid in portfolio assembly or watchlist curation.
+- **User Portfolio API:** Provides detailed portfolio information, including performance metrics and individual entry details.
 
 ## Installation
 
@@ -44,63 +44,23 @@ To get started with this investment application, follow the installation steps b
 
 ## Technical Description
 
-- **User Authentication Views:** Handle user sessions including login, logout, and registration.
-- **Market Analysis Class:** Analyses the market using historical data to generate portfolio suggestions.
-- **Portfolio Management Utilities:** Manage user portfolios, calculate performance, and handle ticker additions/removals.
-- **API Endpoints:** Interact with the frontend for dynamic data retrieval and user-specific updates.
+- **User Authentication Views:** Manages user sessions, including secure login, logout, and registration processes.
+- **Market Analysis Class:** Analyzes the market using historical data to generate actionable portfolio suggestions.
+- **Portfolio Management Utilities:** Assists in managing user portfolios, including ticker management and performance calculations.
+- **API Endpoints:** Provides dynamic interaction with the frontend for real-time data updates and user-specific customizations.
 
 ## Initial Setup
 
-Upon first running the application, execute the `maptickers` command to update the database with the latest ticker information. This step is crucial for the proper functioning of the application and ensures all features related to market data are accurate and up to date.
+To ensure the application's functionality, execute the `maptickers` command before the first run to update the database with the latest ticker information, logos, and full company names. This step is essential for the application to deliver accurate and up-to-date market data.
+
+## Getting Started
+
+After installation, navigate to the main page to start customizing your investment strategy. Use the form to enter your preferences and let the application generate a strategy for you. Explore different sections to optimize your strategy, manage your portfolio, and stay updated with the latest market trends.
 
 ## Contribution
 
 Your contributions are welcome! Please fork the repository and submit a pull request with your proposed changes.
 
-# Key Features
-
-## User Authentication:
-
-- Utilizes Django's built-in mechanisms for logging in and logging out.
-- New user registration with password validation and security.
-
-## Strategy Management:
-
-- Allows users to input their investment strategy preferences.
-- Automatically generates investment strategies based on user preferences.
-
-## Market Analysis:
-
-- Analyzes the market using historical data to generate portfolio recommendations.
-- Uses the `yfinance` library to fetch market data.
-
-## Strategy Optimization:
-
-- Features for optimizing investment strategy parameters to maximize returns.
-- Optimization algorithm using `scipy.optimize`.
-
-## Portfolio Management:
-
-- Creates an equally weighted investment portfolio based on selected tickers.
-- Ability to add and remove tickers from the user's portfolio.
-
-## User Interaction:
-
-- Dynamic charts and data present the performance of strategies compared to the S&P 500 index.
-- A user interface that allows customization and review of strategy results.
-
-## Watchlist:
-
-- Functionality that allows users to create and manage a watchlist of tickers.
-- Adding and removing tickers from the watchlist.
-
-## Ticker Suggestions:
-
-- Automatic ticker suggestions during searches for easier addition to the portfolio or watchlist.
-
-## User Portfolio API:
-
-- Provides information about the portfolio, including performance and details of individual entries.
 
 # Technical Description of Functions
 
