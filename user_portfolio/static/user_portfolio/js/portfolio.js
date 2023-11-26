@@ -1,7 +1,8 @@
 /**
  * Populates portfolio data into the HTML container.
- * Creates a grid layout displaying each stock's information along with a 'Sell' button.
- * @param {Object} data - The portfolio data object containing stock information.
+ * Creates a grid layout displaying each stock's information along with a 'Sell' button,
+ * and also appends performance details at the bottom of the portfolio display.
+ * @param {Object} responseData - The response data object containing portfolio and performance information.
  */
 function populatePortfolioData(responseData) {
   console.log(responseData);
@@ -73,13 +74,13 @@ function populatePortfolioData(responseData) {
         const performanceDiv = document.createElement('div');
         performanceDiv.className = 'flex justify-between performance-info mt-2 p-2 bg-gray-200'; // Tailwind CSS dla stylizacji
     
-        // Używając parseFloat, przekształć string na liczbę i użyj .toFixed(2) dla zaokrąglenia
+        // Use parseFloat to convert string to number and .toFixed(2) for rounding
         const balanceDiv = createPerformanceDetail('Total Balance', `$${parseFloat(performanceInfo.balance).toFixed(2)}`);
-        balanceDiv.className = 'pl-5'
+        balanceDiv.className = 'pl-[8px]'
         const availableCashDiv = createPerformanceDetail('Available Cash', `$${parseFloat(performanceInfo.available_cash).toFixed(2)}`);
         const initialValueDiv = createPerformanceDetail('Initial Portfolio Value', `$${parseFloat(performanceInfo.initial_portfolio_value).toFixed(2)}`);
         const percentChangeDiv = createPerformanceDetail('Gain', `${parseFloat(performanceInfo.percent_change).toFixed(2)}%`);
-        percentChangeDiv.className = 'pr-5'
+        percentChangeDiv.className = 'pr-[8px]'
 
         performanceDiv.appendChild(balanceDiv);
         performanceDiv.appendChild(availableCashDiv);
@@ -90,6 +91,13 @@ function populatePortfolioData(responseData) {
       }
     }
 
+ /**
+ * Creates a detail element for performance data.
+ * Each detail consists of a label and a value, formatted in a specific way.
+ * @param {string} label - The label for the detail.
+ * @param {string} value - The value for the detail.
+ * @returns {HTMLElement} - A div element containing the label and value.
+ */
 function createPerformanceDetail(label, value) {
   const detailDiv = document.createElement('div');
   detailDiv.className = 'performance-detail'; // Add any necessary CSS classes
@@ -105,6 +113,10 @@ function createPerformanceDetail(label, value) {
   return detailDiv;
 }
 
+/**
+ * Fetches portfolio data and populates it in the portfolio display container.
+ * It requests the user's portfolio data from the server and updates the UI accordingly.
+ */
 function createPortfolioDisplay() {
   fetch('/user_portfolio_api/')
       .then(response => {
@@ -118,9 +130,9 @@ function createPortfolioDisplay() {
 }
 
 /**
- * Handles the selling of a ticker.
- * Sends a POST request to the server with the ticker symbol to be sold.
- * @param {string} ticker - The ticker symbol of the stock to be sold.
+ * Handles the selling of a stock by sending a POST request to the server.
+ * Updates the UI based on the response from the server, including refreshing the portfolio display.
+ * @param {HTMLElement} button - The button element that was clicked to sell the stock.
  */
 function handleSellTicker(button) {
   const ticker = button.getAttribute('data-ticker');
@@ -157,13 +169,15 @@ function handleSellTicker(button) {
   });
 }
 
-
+/**
+ * Creates a TradingView widget for the given stock ticker.
+ * Assumes the existence of a specific container element and refreshes its content with the new widget.
+ * @param {string} ticker - The stock ticker symbol.
+ */
   function createTradingViewWidget(ticker) {
-    // Najpierw usuń istniejący widżet, jeśli istnieje
     const container = document.getElementById('tradingview_d7bdc');
-    container.innerHTML = '';
+    container.innerHTML = ''; // Remove existing widget
 
-    // Tworzenie nowego widżetu
     new TradingView.widget({
         "autosize": true,
         "symbol": ticker,
@@ -179,32 +193,37 @@ function handleSellTicker(button) {
 }
   
 
-
-  function widgetOnTickerClick() {
-    document.querySelectorAll('.strategy-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const ticker = this.getAttribute('data-ticker').replace(/-/g, '.');
-            document.getElementById('purchase-container').style.display = 'none';
-            changeFormDisplayButton(ticker);
-            window.displayed_ticker = ticker;
-            createTradingViewWidget(ticker);
-            updateWatchlistFormActions(ticker);
-            fetchTickerPrice(ticker)
-        });
-    });
+/**
+ * Sets up event listeners on strategy buttons for displaying the TradingView widget.
+ */
+function widgetOnTickerClick() {
+  document.querySelectorAll('.strategy-button').forEach(button => {
+      button.addEventListener('click', function() {
+          const ticker = this.getAttribute('data-ticker').replace(/-/g, '.');
+          document.getElementById('purchase-container').style.display = 'none';
+          changeFormDisplayButton(ticker);
+          window.displayed_ticker = ticker;
+          createTradingViewWidget(ticker);
+          updateWatchlistFormActions(ticker);
+          fetchTickerPrice(ticker)
+      });
+  });
 }
 
+/**
+ * Changes the display of the 'Buy' button based on the selected ticker.
+ * Retrieves the current price of the ticker and updates the purchase form accordingly.
+ * @param {string} ticker - The ticker symbol for the stock.
+ */
 function changeFormDisplayButton(ticker) {
   const buyStockDisplayButton = document.getElementById('buy-stock-display-button');
   const purchaseContainer = document.getElementById('purchase-container');
+  fetchTickerPrice(ticker)
 
-  // Upewnij się, że przycisk "Buy" jest widoczny
   buyStockDisplayButton.style.display = 'block';
   
-  // Ustaw tekst przycisku "Buy" na podstawie tickera
   buyStockDisplayButton.innerHTML = `Buy ${ticker}`;
 
-  // Ustaw zdarzenie onclick na przycisku, aby pokazać kontener zakupu
   buyStockDisplayButton.onclick = function () {
     // Pokaż kontener zakupu jeśli był ukryty
     if (purchaseContainer.style.display === 'none') {
@@ -214,17 +233,116 @@ function changeFormDisplayButton(ticker) {
   }
 }
 
+/**
+ * Toggles the display of the searching form and sets up the click event listener on the "Find Stock" button.
+ * Initialized during document load to ensure proper interaction with the user interface.
+ */
+function toggleSearchingFormDisplay() {
+  const searchingForm = document.getElementById('searching-form');
+  const findStockButton = document.getElementById('find-stock');
 
-
-function updateWatchlistFormActions(ticker) {
-  // Zakładając, że masz tylko jeden formularz do aktualizacji
-  // Jeśli jest ich więcej, użyj pętli lub innych metod selekcji
-  const form = document.getElementById('remove-ticker-form');
-  if (form) {
-      form.action = `/ticker_detail/${ticker}/`; // Zaktualizuj akcję formularza
+  if (findStockButton) {
+      findStockButton.onclick = function() {
+          if (searchingForm) {
+              searchingForm.style.display = searchingForm.style.display === 'block' ? 'none' : 'block';
+          }
+      };
   }
 }
 
+/**
+ * Adds a ticker to the watchlist UI.
+ * Creates a new div element with ticker information and appends it to the watchlist container.
+ * Each ticker element consists of a button with the company name and ticker symbol, and a remove button.
+ * @param {string} ticker - The ticker symbol of the stock.
+ * @param {string} companyName - The name of the company associated with the ticker.
+ */
+function addTickerToWatchlistUI(ticker, companyName) {
+  const watchlistContainer = document.getElementById('watchlist-container');
+  if (!watchlistContainer) {
+      console.error('Watchlist container not found');
+      return;
+  }
+
+  // Creating a new element in the watchlist
+  const tickerDiv = document.createElement('div');
+  tickerDiv.className = 'flex items-center space-x-2 border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded hover:bg-gray-100';
+  tickerDiv.setAttribute('data-ticker-id', ticker);
+
+  // Adding the ticker name and company
+  const tickerButton = document.createElement('button');
+  tickerButton.className = 'strategy-button hover:border-none focus:outline-none';
+  tickerButton.textContent = `${companyName} (${ticker})`;
+  tickerButton.onclick = function() {
+    createTradingViewWidget(ticker);
+    fetchTickerPrice(ticker);
+  };
+  tickerDiv.appendChild(tickerButton);
+
+  // Adding a button for removal
+  const removeButton = document.createElement('button');
+  removeButton.onclick = () => manageWatchlistTicker('remove', ticker);
+  removeButton.innerHTML = '<img src="https://www.freeiconspng.com/uploads/close-button-png-27.png" width="20" alt="Remove" class="remove-ticker-icon">';
+  tickerDiv.appendChild(removeButton);
+
+  // Adding the new element to the watchlist container
+  watchlistContainer.appendChild(tickerDiv);
+  updateNoTickersMessage();
+}
+
+/**
+ * Handles adding or removing a ticker from the watchlist.
+ * Sends a POST request with the action and ticker information.
+ * @param {string} action - The action to be performed ('add' or 'remove').
+ * @param {string} ticker - The ticker symbol.
+ * @param {string} companyName - The name of the company corresponding to the ticker.
+ */
+function manageWatchlistTicker(action, ticker, companyName) {
+  console.log("Sending request with data:", { action: action, ticker: ticker });
+  fetch('/manage_watchlist/', {
+      method: 'POST',
+      body: JSON.stringify({ action: action, ticker: ticker }),
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': window.csrfToken,
+      },
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.success) {
+          console.log(data.message);
+          if (action === 'add') {
+            addTickerToWatchlistUI(ticker, companyName);
+            fetchTickerPrice(ticker)
+        }else if (action === 'remove') {
+          removeTickerFromWatchlistUI(ticker);
+          fetchTickerPrice(ticker);
+      }
+      } else {
+          console.error('Action failed');
+      }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+/**
+ * Removes a ticker from the watchlist UI.
+ * Locates and removes the div element corresponding to the ticker from the watchlist container.
+ * @param {string} ticker - The ticker symbol to be removed.
+ */
+function removeTickerFromWatchlistUI(ticker) {
+  const tickerElement = document.querySelector(`div[data-ticker-id='${ticker}']`);
+  if (tickerElement) {
+      tickerElement.remove();
+      updateRemoveButtons()
+      updateNoTickersMessage() 
+  }
+}
+
+/**
+ * Initializes ticker suggestions.
+ * Listens for input on the search bar and fetches ticker suggestions based on the query.
+ */
 function initializeTickerSuggestions() {
   const searchInput = document.getElementById('id_company_name');
   const suggestionsList = document.createElement('ul');
@@ -232,57 +350,71 @@ function initializeTickerSuggestions() {
   searchInput.parentNode.insertBefore(suggestionsList, searchInput.nextSibling);
 
   searchInput.addEventListener('input', function(e) {
-      const query = e.target.value;
+    const query = e.target.value;
 
-      fetch('/ticker_search_suggestions/?query=' + query)
-          .then(response => response.json())
-          .then(data => {
-              suggestionsList.innerHTML = ''; // Czyszczenie poprzednich sugestii
+    fetch('/ticker_search_suggestions/?query=' + query)
+      .then(response => response.json())
+      .then(data => {
+        suggestionsList.innerHTML = '';
 
-              data.forEach(item => {
-                  const form = document.createElement('form');
-                  form.method = 'post';
-                  form.action = `/ticker_detail/${window.displayed_ticker}/`;
+        data.forEach(item => {
+          const listItem = document.createElement('li');
+          const addButton = document.createElement('button');
+          addButton.textContent = item.ticker + ' - ' + item.company_name;
+          addButton.onclick = (event) => {
+            event.preventDefault(); // Zapobieganie domyślnemu zachowaniu przycisku
+            manageWatchlistTicker('add', item.ticker, item.company_name);
+            updateNoTickersMessage();
+          };
 
-                  // Dodaj pole ukryte z tokenem CSRF
-                  const csrfInput = document.createElement('input');
-                  csrfInput.type = 'hidden';
-                  csrfInput.name = 'csrfmiddlewaretoken';
-                  csrfInput.value = window.csrfToken; // Użyj tokenu z zmiennej globalnej
-                  form.appendChild(csrfInput);
-
-                  // Pole ukryte przechowujące wartość tickera
-                  const hiddenInput = document.createElement('input');
-                  hiddenInput.type = 'hidden';
-                  hiddenInput.name = 'ticker';
-                  hiddenInput.value = item.ticker;
-
-                  // Przycisk lub inny element klikalny
-                  const submitButton = document.createElement('button');
-                  submitButton.type = 'submit';
-                  submitButton.textContent = item.ticker + ' - ' + item.company_name;
-                  
-
-                  form.appendChild(hiddenInput);
-                  form.appendChild(submitButton);
-
-                  const listItem = document.createElement('li');
-                  listItem.appendChild(form);
-                  suggestionsList.appendChild(listItem);
-              });
-          })
-          .catch(error => console.error('Error:', error));
+          listItem.appendChild(addButton);
+          suggestionsList.appendChild(listItem);
+        });
+      })
+      .catch(error => console.error('Error:', error));
   });
 }
 
 /**
+ * Updates the remove buttons for each ticker in the watchlist.
+ * Each button's click event is set to call manageWatchlistTicker with the 'remove' action.
+ */
+function updateRemoveButtons() {
+  document.querySelectorAll('.remove-ticker-button').forEach(button => {
+      button.onclick = function() {
+          const ticker = this.getAttribute('data-ticker');
+          manageWatchlistTicker('remove', ticker);
+      };
+  });
+}
+
+/**
+ * Updates the visibility of the "No tickers on your watchlist" message.
+ * Displays the message if there are no tickers in the watchlist.
+ */
+function updateNoTickersMessage() {
+  const noTickersMessage = document.getElementById('in-case-no-tickers');
+  const watchlistContainer = document.getElementById('watchlist-container');
+
+  if (!watchlistContainer) {
+      console.error('Watchlist container not found');
+      return;
+  }
+
+  // Sprawdź, czy są jakieś tickery w watchliście
+  const hasTickers = watchlistContainer.querySelectorAll('div[data-ticker-id]').length > 0;
+
+  // Aktualizuj widoczność wiadomości
+  noTickersMessage.style.display = hasTickers ? 'none' : 'block';
+}
+
+
+/**
  * Fetches the current price of a given ticker symbol from the API.
- * On successful retrieval, updates the specified element in the DOM with the ticker's price.
- * If an error occurs during the fetch operation or from the API, logs the error to the console.
- *
+ * Updates the purchase form with the ticker's current price and available cash.
+ * Handles any errors that occur during the fetch operation.
  * @param {string} ticker - The ticker symbol for which the price is being fetched.
  */
-
 function fetchTickerPrice(ticker) {
   fetch(`/searching_ticker_value_api/?ticker=${ticker}`)
     .then(response => {
@@ -324,7 +456,8 @@ function fetchTickerPrice(ticker) {
 
 /**
  * Calculates the total price of the purchase based on the price per share and the quantity.
- * If the total price exceeds the available cash, it displays an alert and disables the submit button.
+ * Displays an alert and disables the submit button if the total price exceeds the available cash.
+ * Interacts with the user interface to provide real-time feedback.
  * @param {number} pricePerShare - The price per share of the stock.
  */
 function calculateTotalPrice(pricePerShare) {
@@ -369,9 +502,9 @@ function calculateTotalPrice(pricePerShare) {
 
 /**
  * Handles the submission of the portfolio form.
- * Gathers data from the form fields, sends it to the server via a POST request,
- * and processes the server's response. It prevents the default form submission behavior,
- * sends the form data as JSON, and handles the server's JSON response.
+ * Sends data to the server via a POST request and updates the UI based on the server's response.
+ * Prevents default form submission, sends form data as JSON, and handles the JSON response.
+ * Refreshes the portfolio display after a successful transaction.
  */
 function handleAppendTickerToPortfolioForm() {
   const form = document.querySelector('#append-to-portfolio-form');

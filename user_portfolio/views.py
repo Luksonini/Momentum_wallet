@@ -163,26 +163,6 @@ def ticker_detail(request, ticker):
     watchlist = Watchlist.objects.filter(user=request.user).first()
     watchlist_tickers = watchlist.tickers.all() if watchlist else []
 
-    if request.method == 'POST':
-        if 'ticker' in request.POST:
-            ticker_adding_to_watchlist = request.POST.get('ticker')  
-            if ticker_adding_to_watchlist:
-                watchlist_ticker = MappedTickers.objects.filter(ticker=ticker_adding_to_watchlist).first()
-                if watchlist_ticker:
-                    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
-                    watchlist.tickers.add(watchlist_ticker)
-                    watchlist.save()
-
-        elif 'remove_ticker' in request.POST:
-            ticker_removed_from_watchlist = request.POST.get('remove_ticker')
-            if ticker_removed_from_watchlist:
-                watchlist_ticker = MappedTickers.objects.filter(ticker=ticker_removed_from_watchlist).first()
-                if watchlist_ticker:
-                    watchlist = Watchlist.objects.get(user=request.user)
-                    watchlist.tickers.remove(watchlist_ticker)
-                    watchlist.save()
-
-
     filter = MappedTickersFilter(request.GET, queryset=MappedTickers.objects.all())
 
     return render(request, "user_portfolio/portfolio.html", {
@@ -192,6 +172,35 @@ def ticker_detail(request, ticker):
         'filter': filter,
     })
 
+# watchlist
+
+
+def manage_watchlist(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        action = data.get('action')
+        ticker = data.get('ticker')
+        print(action)
+        print(ticker)
+
+        if action == 'add':
+            watchlist_ticker = MappedTickers.objects.filter(ticker=ticker).first()
+            if watchlist_ticker:
+                watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+                watchlist.tickers.add(watchlist_ticker)
+                watchlist.save()
+            return JsonResponse({'success': True, 'message': 'Ticker added to watchlist'})
+
+        elif action == 'remove':
+            watchlist_ticker = MappedTickers.objects.filter(ticker=ticker).first()
+            if watchlist_ticker:
+                watchlist = Watchlist.objects.get(user=request.user)
+                watchlist.tickers.remove(watchlist_ticker)
+                watchlist.save()
+            return JsonResponse({'success': True, 'message': 'Ticker removed from watchlist'})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
+
 
 def ticker_suggestions(request):
     query = request.GET.get('query', '')
@@ -200,7 +209,7 @@ def ticker_suggestions(request):
     if query:  # Sprawdzanie, czy query nie jest pustym stringiem
         suggestions = MappedTickers.objects.filter(
             Q(ticker__icontains=query) | Q(company_name__icontains=query)
-        )[:2]  # ograniczenie do 2 sugestii
+        )[:10]  # ograniczenie do 2 sugestii
 
         data = [{'ticker': t.ticker, 'company_name': t.company_name} for t in suggestions]
 

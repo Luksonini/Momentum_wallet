@@ -300,6 +300,51 @@ function updateTickerDisplay() {
         console.error('Could not fetch ticker data:', error);
       });
   }
+
+  function handleSubmitPortfolioForm() {
+    const form = document.querySelector('#purchase-container form');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Zbieranie danych z formularza
+        const formData = new FormData(form);
+        const data = {
+            'ticker_symbol': formData.get('ticker_symbol'),
+            'purchase_price': formData.get('purchase_price'),
+            'quantity': formData.get('quantity'),
+            'csrfmiddlewaretoken': formData.get('csrfmiddlewaretoken')  // Wartość tokena CSRF
+        };
+
+        // Wysyłanie danych do API
+        fetch('/ścieżka-do-user_portfolio_api/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfmiddlewaretoken  // Wymagane dla Django CSRF
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            // Tutaj możesz obsłużyć dane zwrotne, np. aktualizując UI
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    handleSubmitPortfolioForm();
+    // Tutaj możesz wywołać inne funkcje inicjalizujące
+});
   
 
 // Obsługa zdarzeń formularza

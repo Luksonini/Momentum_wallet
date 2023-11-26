@@ -17,6 +17,7 @@ urlpatterns = [
     # path('user_portfolio_api/', views.PortfolioAPIView.as_view(), name='portfolio-api'),
     path('ticker_search_suggestions/', views.ticker_suggestions, name='ticker_suggestions'),
     path('searching_ticker_value_api/', views.searching_ticker_value, name='ticker_suggestions'),
+    path('manage_watchlist/', views.manage_watchlist, name='manage_watchlist'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

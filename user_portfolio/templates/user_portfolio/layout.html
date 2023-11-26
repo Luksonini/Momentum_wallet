@@ -5,6 +5,7 @@
     <head>
         <title>{% block title %}Social Network{% endblock %}</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
         <script src="https://cdn.tailwindcss.com"></script>
         
@@ -13,37 +14,36 @@
         {% endblock scripts %}
     </head>
     <body>
-
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Network</a>
-          
+          <nav style="font-family: Arial, Helvetica, sans-serif;">
             <div>
-              <ul class="navbar-nav mr-auto">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><strong>{{ user.username }}</strong></a>
-                    </li>
-                {% endif %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'index' %}">All Posts</a>
-                </li>
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Following</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'ticker_detail' %}">Log In</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
-                    </li>
-                {% endif %}
-              </ul>
+                <img src="{% static 'user_portfolio/capybara.webp' %}" alt="Capybara">
             </div>
+            <div class="flex items-center justify-between px-4 py-3 bg-transparent">
+                <a href="#" class="text-gray-800 font-semibold uppercase tracking-widest text-sm">Capybara Investments</a>
+                <ul class="flex space-x-4">
+                  {% if user.is_authenticated %}
+                    <li>
+                      <a href="#" class="text-gray-800 font-semibold uppercase tracking-widest text-sm"><strong>{{ user.username }}</strong></a>
+                    </li>
+                  {% endif %}
+                  <li>
+                    <a href="{% url 'index' %}" class="text-gray-800 font-semibold uppercase tracking-widest text-sm">All Posts</a>
+                  </li>
+                  {% if user.is_authenticated %}
+                    <li>
+                      <a href="{% url 'logout' %}" class="text-gray-800 font-semibold uppercase tracking-widest text-sm">Log Out</a>
+                    </li>
+                  {% else %}
+                    <li>
+                      <a href="{% url 'ticker_detail' %}" class="text-gray-800 font-semibold uppercase tracking-widest text-sm">Log In</a>
+                    </li>
+                    <li>
+                      <a href="{% url 'register' %}" class="text-gray-800 font-semibold uppercase tracking-widest text-sm">Register</a>
+                    </li>
+                  {% endif %}
+                </ul>
+            </div>
+
           </nav>
         
         <div class="body">

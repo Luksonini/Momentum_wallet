@@ -36,26 +36,25 @@
     </div>
   </div>
   <hr>
-  <div class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4 mt-4">
+
+  <div id = "watchlist-container" class="flex flex-wrap gap-3 max-w-5xl mx-auto pb-4 mt-4">
     <p class="font-bold">Watchlist:</p>
     {% if watchlist_tickers %}
         {% for ticker in watchlist_tickers %}
-            <div class="flex items-center space-x-2 border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">
-                <button data-ticker="{{ticker.ticker}}" class="strategy-button hover:border-none focus:outline-none">
-                    {{ticker.company_name}} ({{ticker.ticker}})
+            <div data-ticker-id="{{ ticker.ticker }}" class="flex items-center space-x-2 border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded hover:bg-gray-100 hover:border-gray-400 hover:shadow-md transition-all duration-200">
+                <button data-ticker="{{ ticker.ticker }}" class="strategy-button hover:border-none focus:outline-none">
+                    {{ ticker.company_name }} ({{ ticker.ticker }})
                 </button>
-                <!-- Ukryta forma -->
-                <form id="remove-ticker-{{ticker.ticker}}" action="{% url 'ticker_detail' ticker=ticker.ticker %}" method="post" class="focus:outline-none flex items-center">
-                    {% csrf_token %}
-                    <input type="hidden" name="remove_ticker" value="{{ticker.ticker}}">
-                    <button type="submit" class="focus:outline-none active:border-none" onclick="event.stopPropagation();"><img src="https://www.freeiconspng.com/uploads/close-button-png-27.png" width="20" alt="Remove" class="remove-ticker-icon"></button>
-                </form>
+                <!-- Przycisk do usuwania tickeru -->
+                <button data-ticker="{{ ticker.ticker }}" onclick="manageWatchlistTicker('remove', '{{ticker.ticker}}')" class="remove-ticker-button focus:outline-none active:border-none">
+                    <img src="https://www.freeiconspng.com/uploads/close-button-png-27.png" width="20" alt="Remove" class="remove-ticker-icon">
+                </button>
             </div>
         {% endfor %}
     {% else %}
-        <p>Brak tickerów na watchliście.</p>
+        <p id='in-case-no-tickers'>No tickers on your watchlist</p>
     {% endif %}
-  </div>
+</div>
   <div class="container max-w-8xl flex gap-5 justify-center mb-3">
     <!-- Przycisk Buy Stock -->
     <button id='buy-stock-display-button' class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" style='display: none;'>
@@ -63,17 +62,16 @@
     </button>
 
     <!-- Przycisk Find Stock -->
-    <button class="bg-purple-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+    <button id = 'find-stock' class="bg-purple-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
       Find Stock
     </button>
 </div>
 
-  <form method="get" id="searching-form" class="min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow">
+  <form method="get" id="searching-form" class="h-[200px] overflow-auto max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" style="display: none;">
     {{ filter.form.as_p | safe }}
   </form>
   <div id="purchase-container" class="container mx-auto px-4 " style='display: none;'>
     <form id="append-to-portfolio-form" class="relative min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post" >
-        <!-- Token CSRF - możesz go dodać ręcznie lub wygenerować za pomocą skryptu JavaScript -->
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         
         <div>
@@ -114,10 +112,12 @@
     window.currentPricePerShare = 0;
     document.addEventListener('DOMContentLoaded', function() {
       createPortfolioDisplay();
+      updateRemoveButtons();
       widgetOnTickerClick();
       initializeTickerSuggestions();
       handleAppendTickerToPortfolioForm();
       createTradingViewWidget(window.displayed_ticker);
+      toggleSearchingFormDisplay() 
       setInterval(function() {
           createPortfolioDisplay();
           var purchaseContainer = document.getElementById("purchase-container");
