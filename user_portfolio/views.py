@@ -44,7 +44,7 @@ def index(request):
         equally_portfolio = EqualWeightedPortfolio(total_amount=int(user_preferences.balance), tickers=user_strategy_model.current_tickers)
         equally_portfolio_data = equally_portfolio.get_chart_data()
 
-    return render(request, "user_portfolio/index.html", {
+    return render(request, "user_portfolio/momentum_settings.html", {
         'strategy_form': strategy_form,
         'chart_data': json.dumps(chart_data) if chart_data else None,
         'equally_portfolio_data' : equally_portfolio_data,
