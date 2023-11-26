@@ -108,57 +108,57 @@ Your contributions are welcome! Please fork the repository and submit a pull req
 
 - Renders the main page with a form for entering strategies and displays portfolio data.
 
-# `chart_data`:
+`chart_data`:
 
 - An API endpoint that receives data from the frontend, saves user preferences, and generates chart data for the current portfolio strategy.
 
-# `optimisation_view`:
+`optimisation_view`:
 
 - An API endpoint for optimizing strategy parameters, saves new parameters in user preferences, and generates chart data.
 
-# `tickers_info`:
+`tickers_info`:
 
 - An API endpoint that provides information about the tickers in the user's portfolio.
 
-# `ticker_detail`:
+`ticker_detail`:
 
 - Renders a page with detailed information about the selected ticker, user strategies, and watchlist.
 
-# `manage_watchlist`:
+`manage_watchlist`:
 
 - An API endpoint for managing the watchlist, allowing the addition and removal of tickers.
 
-# `ticker_suggestions`:
+`ticker_suggestions`:
 
 - An API endpoint that provides ticker suggestions based on user queries.
 
-# `user_portfolio_api`:
+`user_portfolio_api`:
 
 - An API endpoint that manages the user's portfolio, allows adding and removing tickers, and calculates portfolio performance.
 
-# `searching_ticker_value`:
+`searching_ticker_value`:
 
 - An API endpoint that searches for the current value of a ticker and the user's available funds.
 
-# `login_view`, `logout_view`, `register`:
+`login_view`, `logout_view`, `register`:
 
 - Views to manage the login, logout, and registration process for users.
 
 # Helper Classes and Methods
 
-# `UserPortfolio_utils`:
+`UserPortfolio_utils`:
 
 - A helper class for managing the user's portfolio, adding and removing tickers, and calculating performance.
 
-# `EqualWeightedPortfolio`:
+`EqualWeightedPortfolio`:
 
 - A class for creating and managing an equally weighted portfolio, calculating current prices, and generating chart data.
 
-# `MarketAnalysis`:
+`MarketAnalysis`:
 
 - A class for conducting market analysis, strategy optimization, and generating strategy results.
 
-# `StockData`:
+`StockData`:
 
 - A helper class for fetching and processing stock market data for market analysis.
 
