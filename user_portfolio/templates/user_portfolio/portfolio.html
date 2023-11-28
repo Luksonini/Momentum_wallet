@@ -27,18 +27,17 @@
     </script>
   </div>
   <hr class="w-3/4 mx-auto border-2 border-[#25174B]">
-  <div class="mt-4">
-    <div class="flex flex-wrap gap-2 max-w-8xl mx-auto pb-4 px-[180px]">
-      <p class="font-bold">Strategy:</p>
+  <p class="font-bold text-center p-2">Strategy:</p>
+  <div class="mb-4">
+    <div class="flex flex-wrap gap-2 max-w-8xl mx-auto px-2 sm:px-[180px]">
       {% for key, name in strategy_tickers_dict.items %}
       <button data-ticker="{{key}}" class="strategy-button border border-gray-300 shadow-sm bg-[#25174B] text-[#e9e7ed] font-semibold pl-2 px-4 rounded hover:bg-[#50456e] hover:border-gray-400 hover:shadow-md transition-all duration-200">{{name}} ({{key}})</button>
       {% endfor %}
     </div>
   </div>
   <hr class="w-3/4 mx-auto border-2 border-[#25174B]">
-
-  <div id = "watchlist-container" class="flex flex-wrap gap-2 max-w-8xl mx-auto pb-4 px-[180px] mt-4">
-    <p class="font-bold">Watchlist:</p>
+  <p class="font-bold text-center p-2">Watchlist:</p>
+  <div id = "watchlist-container" class="flex flex-wrap gap-2 max-w-8xl mx-auto px-2 sm:px-[180px] mb-4">
     {% if watchlist_tickers %}
         {% for ticker in watchlist_tickers %}
             <div data-ticker-id="{{ ticker.ticker }}" class="flex items-center space-x-2 border border-gray-300 shadow-sm bg-[#25174B] text-[#e9e7ed] font-semibold pl-2 px-4 rounded hover:bg-[#50456e] hover:border-gray-400 hover:shadow-md transition-all duration-200">
@@ -105,7 +104,7 @@
     </form>
 </div>
 
-  <div id="portfolio-display-container" class="container mx-auto px-4"></div>
+  <div id="portfolio-display-container" class="container mx-auto sm:px-0"></div>
 
   <input type="text" name="ticker_price" value="{{ request.GET.ticker }}" />
   <script>

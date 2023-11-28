@@ -12,43 +12,76 @@ function populatePortfolioData(responseData) {
   // Creating headers
   const headers = ['Company Info', 'Quantity', 'Purchase Price', 'Current Price', 'Value', 'Price Change', 'Percent Change', 'Action'];
   const headerDiv = document.createElement('div');
-  headerDiv.className = 'grid grid-cols-8 text-center bg-[#25174B] text-[#e9e7ed] p-2 font-semibold'; // Styling the header
-  headers.forEach(headerText => {
-      const header = document.createElement('div');
-      header.textContent = headerText;
-      header.className = 'col-span-1'; // Adjust span as needed
-      headerDiv.appendChild(header);
+  headerDiv.className = 'grid grid-cols-4 sm:grid-cols-8 text-center bg-[#25174B] text-[#e9e7ed] p-2 font-semibold'; // Styling the header
+
+  headers.forEach((headerText, index) => {
+  const header = document.createElement('div');
+  header.textContent = headerText;
+  header.className = 'md:col-span-1'; // Klasa dla większych ekranów
+  // Ukryj kolumny 'Quantity', 'Purchase Price', 'Current Price', i 'Value' na mniejszych ekranach
+  if (['Quantity', 'Purchase Price', 'Current Price', 'Value'].includes(headerText)) {
+    header.className += ' hidden md:block';
+  }
+  headerDiv.appendChild(header);
   });
   container.appendChild(headerDiv);
 
-  // Iterating over each entry in the data object
-  const portfolioData = responseData.portfolio_info;
-  Object.entries(portfolioData).forEach(([ticker, info]) => {
-      const rowDiv = document.createElement('div');
-      rowDiv.className = 'grid grid-cols-8 text-center p-2 hover:bg-gray-100 font-semibold'; // Styling the row
+// Iterating over each entry in the data object
+const portfolioData = responseData.portfolio_info;
+Object.entries(portfolioData).forEach(([ticker, info]) => {
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'grid grid-cols-4 sm:grid-cols-8 text-center p-2 hover:bg-gray-100 font-semibold'; // Styling the row// Styling the row
 
-      // Column with company info (ticker, company name)
-      const companyInfoDiv = document.createElement('div');
-      companyInfoDiv.className = 'col-span-1 text-left'; // Styling
-      const companyName = document.createElement('div');
-      companyName.textContent = `${info.company_name} (${ticker})`;
-      companyName.className = 'company-info-class'; // Add your custom CSS class
-      companyInfoDiv.appendChild(companyName);
-      rowDiv.appendChild(companyInfoDiv);
+    // Column with company info (ticker, company name)
+    const companyInfoDiv = document.createElement('div');
+    companyInfoDiv.className = 'col-span-1 text-left'; // Styling
+
+    // Create two separate elements for ticker and company name
+    const tickerDiv = document.createElement('div');
+    tickerDiv.textContent = ticker;
+    tickerDiv.className = 'block md:hidden'; // Tylko ticker będzie widoczny na małych ekranach
+
+    const companyNameDiv = document.createElement('div');
+    companyNameDiv.textContent = info.company_name;
+    companyNameDiv.className = 'hidden md:block'; // Pełna nazwa firmy będzie ukryta na małych ekranach
+
+    // Add both ticker and company name to the company info div
+    companyInfoDiv.appendChild(tickerDiv);
+    companyInfoDiv.appendChild(companyNameDiv);
+
+    rowDiv.appendChild(companyInfoDiv);
 
       // Rest of the data
+      // headers.slice(1, -1).forEach(header => { // Skip the last 'Action' header
+      //     const cellDiv = document.createElement('div');
+      //     let textContent = info[header.toLowerCase().replace(/ /g, '_')];
+      //     if (typeof textContent === 'number') {
+      //         textContent = textContent.toFixed(2) + '$';
+      //     }
+      //     cellDiv.textContent = textContent;
+      //     cellDiv.className = 'col-span-1';
+      //     if (header === 'Price Change' || header === 'Percent Change') {
+      //         cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
+      //     }
+      //     rowDiv.appendChild(cellDiv);
+      // });
       headers.slice(1, -1).forEach(header => { // Skip the last 'Action' header
-          const cellDiv = document.createElement('div');
-          let textContent = info[header.toLowerCase().replace(/ /g, '_')];
-          if (typeof textContent === 'number') {
-              textContent = textContent.toFixed(2) + '$';
-          }
-          cellDiv.textContent = textContent;
-          cellDiv.className = 'col-span-1';
-          if (header === 'Price Change' || header === 'Percent Change') {
-              cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
-          }
-          rowDiv.appendChild(cellDiv);
+        const cellDiv = document.createElement('div');
+        let textContent = info[header.toLowerCase().replace(/ /g, '_')];
+        if (typeof textContent === 'number') {
+            textContent = textContent.toFixed(2) + '$';
+        }
+        cellDiv.textContent = textContent;
+        cellDiv.className = 'md:col-span-1';
+        // Dodaj klasę "hidden md:block" dla kolumny 'Quantity', 'Purchase Price', 'Current Price', i 'Value'
+        if (['Quantity', 'Purchase Price', 'Current Price', 'Value'].includes(header)) {
+          cellDiv.className += ' hidden md:block';
+        }
+        // Dodatkowe style dla zmiany koloru tekstu
+        if (header === 'Price Change' || header === 'Percent Change') {
+          cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
+        }
+        rowDiv.appendChild(cellDiv);
       });
 
           // Adding the 'Action' column with a 'Sell' button

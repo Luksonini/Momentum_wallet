@@ -3,7 +3,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+
         <title>{% block title %}Social Network{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'user_portfolio/index.css' %}">
@@ -16,7 +18,7 @@
     </head>
     <body class="text-2xl" style="font-family: 'Montserrat', sans-serif;">
       <nav class="bg-[#25174B] shadow-md pb-2 pt-2 text-4xl">
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-5 px-4">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-10 px-4">
           <!-- Left Side Links -->
           <ul class="flex flex-col sm:flex-row flex-1 justify-end gap-10">
             <!-- Your left side links go here -->
@@ -29,7 +31,7 @@
           </ul>
       
           <!-- Center Logo -->
-          <div class="flex-0 hidden sm:block">
+          <div class="flex-0 hidden md:block">
             <img class="block h-[200px]" src="{% static 'user_portfolio/images/capy3wobg_c.png' %}" alt="Capybara">
           </div>
       
@@ -45,7 +47,7 @@
               </li>
             {% else %}
               <li>
-                <a href="{% url 'ticker_detail' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Log In</a>
+                <a href="{% url 'login' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Log In</a>
               </li>
               <li>
                 <a href="{% url 'register' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Register</a>

@@ -1,24 +1,36 @@
 {% extends "user_portfolio/layout.html" %}
-
+{% load static %}
 {% block body %}
 
-    <h2>Login</h2>
-
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
-
-    <form action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <input autofocus class="form-control" type="text" name="username" placeholder="Username">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
-        </div>
-        <input class="btn btn-primary" type="submit" value="Login">
-    </form>
-
-    Don't have an account? <a href="{% url 'register' %}">Register here.</a>
-
+    <div class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center py-12">
+        <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-[#e9e7ed] to-[#25174B] shadow-lg transform -skew-y-6 md:skew-y-0 md:-rotate-6 md:rounded-3xl">
+            </div>
+            <div class="relative px-4 pb-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+                <div class="max-w-md mx-auto">
+                    <div class="sm:block">
+                        <img class="block h-[200px] mx-auto " src="{% static 'user_portfolio/images/capy3wobg_c.png' %}" alt="Capybara">
+                    </div>
+                    <div>
+                    </div>
+                    <div>
+                        <form  autocomplete="off" action="{% url 'login' %}" method="post" class="py-8 text-base leading-6 space-y-4 sm:text-lg sm:leading-7">
+                            {% csrf_token %}
+                            <div class="relative" id="beleu">
+                                <input autocomplete="off" name="username" id="username" class="appearance-none bg-transparent border-b-2 border-[#a28834] text-[#61521f] text-xl w-full  mr-3 py-3 px-2 leading-tight focus:outline-none" type="text" placeholder="Login" aria-label="Full name">
+                            </div>
+                            <div class="relative">
+                                <input autocomplete="off" id="password" name="password" type="password" class="appearance-none bg-transparent border-b-2 border-[#a28834] w-full text-[#61521f] text-xl mr-3 py-3 px-2 leading-tight focus:outline-none" type="text" placeholder="Password" aria-label="Full name">
+                            </div>
+                            <div class="relative">
+                                <button class="bg-[#a28834] text-white text-xl rounded-md px-2 py-2 hover:bg-[#796832]">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                Don't have an account? <a class="text-[#928ba5]" href="{% url 'register' %}">Register here.</a>
+            </div>
+        </div>   
+    </div>
 {% endblock %}

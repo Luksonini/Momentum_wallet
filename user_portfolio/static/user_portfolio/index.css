@@ -160,3 +160,25 @@ Paragraph default: 1.6
     font-weight: bold;
     margin-top: 1rem; /* Space between quote and author */
   }
+
+
+  #password, #username:-webkit-autofill {
+    /* Dostosuj stylizację według własnych preferencji */
+    background-color: transparent !important; /* Kolor tła */
+    -webkit-box-shadow:0 0 0 50px white inset; /* Change the color to your own background color */
+    -webkit-text-fill-color: #61521f;
+
+    /* itd. */
+}
+
+@media (max-width: 768px) {
+  .md:skew-y-0 {
+    /* Stylizacja dla małych ekranów */
+  }
+  .md:-rotate-6 {
+    /* Stylizacja dla małych ekranów */
+  }
+  .md:rounded-3xl {
+    /* Stylizacja dla małych ekranów */
+  }
+}
