@@ -112,6 +112,7 @@ Object.entries(portfolioData).forEach(([ticker, info]) => {
         balanceDiv.className = 'pl-[8px]'
         const availableCashDiv = createPerformanceDetail('Available Cash', `$${parseFloat(performanceInfo.available_cash).toFixed(2)}`);
         const initialValueDiv = createPerformanceDetail('Initial Portfolio Value', `$${parseFloat(performanceInfo.initial_portfolio_value).toFixed(2)}`);
+        initialValueDiv.className='hidden sm:block'
         const percentChangeDiv = createPerformanceDetail('Gain', `${parseFloat(performanceInfo.percent_change).toFixed(2)}%`);
         percentChangeDiv.className = 'pr-[8px]'
 

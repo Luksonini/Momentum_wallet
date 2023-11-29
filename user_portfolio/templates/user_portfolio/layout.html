@@ -17,16 +17,16 @@
         {% endblock scripts %}
     </head>
     <body class="text-2xl" style="font-family: 'Montserrat', sans-serif;">
-      <nav class="bg-[#25174B] shadow-md pb-2 pt-2 text-4xl">
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-10 px-4">
+      <nav class="bg-[#25174B] shadow-md pb-2 pt-2 sm:text-4xl text-center">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-10 px-4">
           <!-- Left Side Links -->
-          <ul class="flex flex-col sm:flex-row flex-1 justify-end gap-10">
+          <ul class="flex flex-col sm:flex-row flex-1 justify-end gap-5 sm:gap-10">
             <!-- Your left side links go here -->
             <li>
-              <a href="{% url 'index' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Main Page</a>
+              <a href="{% url 'index' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Main Page</a>
             </li>
             <li>
-              <a href="{% url 'momentum' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Momentum</a>
+              <a href="{% url 'momentum' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Momentum</a>
             </li>
           </ul>
       
@@ -36,21 +36,21 @@
           </div>
       
           <!-- Right Side Links -->
-          <ul class="flex flex-col sm:flex-row flex-1 gap-10">
+          <ul class="flex flex-col sm:flex-row flex-1 gap-5 sm:gap-10">
             <!-- Your right side links go here -->
             <li>
-              <a href="{% url 'ticker_detail' ticker='AAPL' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Portfolio</a>
+              <a href="{% url 'ticker_detail' ticker='AAPL' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Portfolio</a>
             </li>
             {% if user.is_authenticated %}
               <li>
-                <a href="{% url 'logout' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Log Out</a>
+                <a href="{% url 'logout' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Log Out</a>
               </li>
             {% else %}
               <li>
-                <a href="{% url 'login' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Log In</a>
+                <a href="{% url 'login' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Log In</a>
               </li>
               <li>
-                <a href="{% url 'register' %}" class="text-gray-100 font-semibold uppercase tracking-widest hover:text-gray-300">Register</a>
+                <a href="{% url 'register' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Register</a>
               </li>
             {% endif %}
           </ul>
