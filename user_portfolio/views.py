@@ -143,7 +143,7 @@ def tickers_info(request):
 
     return JsonResponse(ticker_info)
 
-
+@login_required(login_url='login')
 def ticker_detail(request, ticker):
     strategy_tickers = UserStrategyModel.objects.filter(user=request.user).first()
     strategy_tickers = json.loads(strategy_tickers.current_tickers) if strategy_tickers and strategy_tickers.current_tickers else []

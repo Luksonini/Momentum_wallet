@@ -20,7 +20,7 @@ function populatePortfolioData(responseData) {
   header.className = 'md:col-span-1'; // Klasa dla większych ekranów
   // Ukryj kolumny 'Quantity', 'Purchase Price', 'Current Price', i 'Value' na mniejszych ekranach
   if (['Quantity', 'Purchase Price', 'Current Price', 'Value'].includes(headerText)) {
-    header.className += ' hidden md:block';
+    header.className += ' hidden sm:block';
   }
   headerDiv.appendChild(header);
   });
@@ -39,7 +39,7 @@ Object.entries(portfolioData).forEach(([ticker, info]) => {
     // Create two separate elements for ticker and company name
     const tickerDiv = document.createElement('div');
     tickerDiv.textContent = ticker;
-    tickerDiv.className = 'block md:hidden'; // Tylko ticker będzie widoczny na małych ekranach
+    tickerDiv.className = 'block sm:hidden'; // Tylko ticker będzie widoczny na małych ekranach
 
     const companyNameDiv = document.createElement('div');
     companyNameDiv.textContent = info.company_name;
@@ -72,10 +72,10 @@ Object.entries(portfolioData).forEach(([ticker, info]) => {
             textContent = textContent.toFixed(2) + '$';
         }
         cellDiv.textContent = textContent;
-        cellDiv.className = 'md:col-span-1';
+        cellDiv.className = 'sm:col-span-1';
         // Dodaj klasę "hidden md:block" dla kolumny 'Quantity', 'Purchase Price', 'Current Price', i 'Value'
         if (['Quantity', 'Purchase Price', 'Current Price', 'Value'].includes(header)) {
-          cellDiv.className += ' hidden md:block';
+          cellDiv.className += ' hidden sm:block';
         }
         // Dodatkowe style dla zmiany koloru tekstu
         if (header === 'Price Change' || header === 'Percent Change') {
