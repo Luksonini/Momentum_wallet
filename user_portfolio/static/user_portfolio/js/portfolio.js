@@ -276,11 +276,11 @@ function toggleSearchingFormDisplay() {
   const findStockButton = document.getElementById('find-stock');
 
   if (findStockButton) {
-      findStockButton.onclick = function() {
-          if (searchingForm) {
-              searchingForm.style.display = searchingForm.style.display === 'block' ? 'none' : 'block';
-          }
-      };
+    findStockButton.onclick = function() {
+      if (searchingForm) {
+        searchingForm.style.display = searchingForm.style.display === 'block' ? 'none' : 'block';
+      }
+    };
   }
 }
 
@@ -300,7 +300,7 @@ function addTickerToWatchlistUI(ticker, companyName) {
 
   // Creating a new element in the watchlist
   const tickerDiv = document.createElement('div');
-  tickerDiv.className = 'flex items-center space-x-2 border border-gray-300 shadow-sm text-gray-700 font-medium pl-2 px-4 rounded hover:bg-gray-100';
+  tickerDiv.className = 'flex items-center space-x-2 border border-gray-300 shadow-sm bg-[#25174B] text-[#e9e7ed] font-semibold pl-2 px-4 rounded hover:bg-[#50456e] hover:border-gray-400 hover:shadow-md transition-all duration-200';
   tickerDiv.setAttribute('data-ticker-id', ticker);
 
   // Adding the ticker name and company
