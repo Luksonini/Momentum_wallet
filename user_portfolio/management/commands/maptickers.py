@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def get_company_logo_and_name(self, ticker):
         api_url = f'https://api.api-ninjas.com/v1/logo?ticker={ticker}'
-        response = requests.get(api_url, headers={'X-Api-Key': '+zhgPUvc2xvwDNSZsaZd8A==PrkYMsTwM93rZtrk'})
+        response = requests.get(api_url, headers={'X-Api-Key': 'JQu0F7smsjZCYEOOqd1sc6hVTcFn1bAfsymxrouc'})
 
         if response.status_code == requests.codes.ok:
             data = response.json()
@@ -24,7 +24,7 @@ class Command(BaseCommand):
                 name = data['results'].get('name')
                 logo_url = data['results']['branding'].get('logo_url')
                 if logo_url:
-                    logo_url += '?apiKey=4bVD25p6Wi6ddaJ1vTkSWySahqvcd9qJ'
+                    logo_url += '?apiKey=4bVD25p6Wi6ddaJ1vTkSWySahqvcd9qJ' 
                 return name, logo_url
         except KeyError:
             return None, None

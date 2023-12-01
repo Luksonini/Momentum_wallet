@@ -31,7 +31,7 @@ class StockData:
         self.tickers = [ticker.replace('.', '-') for ticker in self.tickers]
 
     def _download_data(self):
-        self.df = yf.download(self.tickers, start=self.start, interval='1m')['Close']
+        self.df = yf.download(self.tickers, start=self.start, interval='1mo')['Close']
         self.df.index = pd.to_datetime(self.df.index)
 
     def _pricefilter_rem(self, ticker):

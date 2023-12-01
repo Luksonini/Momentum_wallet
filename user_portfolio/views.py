@@ -30,6 +30,7 @@ def momentum(request):
     optimisation_form = OptimisationPreferencesForm(request.POST or None)
     user_strategy_model = UserStrategyModel.objects.filter(user=request.user).first()
     chart_data = None
+    equally_portfolio_data = None
 
     user_preferences, created = MarketAnalysisPreferences.objects.get_or_create(user=request.user)
 
@@ -47,43 +48,81 @@ def momentum(request):
         'user_preferences' : user_preferences,
     })
 
-@login_required(login_url='login')
-def chart_data(request):
-    start_date_str = request.GET.get('start_date', None)
-    window = request.GET.get('window')
-    nlargest = request.GET.get('nlargest')
-    balance = request.GET.get('balance')
-    start_date = datetime.strptime(str(start_date_str), '%Y-%m-%d').date()
-    user_preferences = MarketAnalysisPreferences.objects.get(user=request.user)
-    user_preferences.start_date = start_date 
-    user_preferences.window = int(window)
-    user_preferences.nlargest_window = int(nlargest)
-    user_preferences.balance = int(balance)
+# @login_required(login_url='login')
+# def chart_data(request):
+#     start_date_str = request.GET.get('start_date', None)
+#     window = request.GET.get('window')
+#     nlargest = request.GET.get('nlargest')
+#     balance = request.GET.get('balance')
+#     start_date = datetime.strptime(str(start_date_str), '%Y-%m-%d').date()
+#     user_preferences = MarketAnalysisPreferences.objects.get(user=request.user)
+#     user_preferences.start_date = start_date 
+#     user_preferences.window = int(window)
+#     user_preferences.nlargest_window = int(nlargest)
+#     user_preferences.balance = int(balance)
 
-    user_preferences.save()
-    market_analysis = MarketAnalysis(
-        start_date=str(start_date),
-        window=user_preferences.window,
-        nlargest_window=user_preferences.nlargest_window,
-    )
+#     user_preferences.save()
+#     market_analysis = MarketAnalysis(
+#         start_date=str(start_date),
+#         window=user_preferences.window,
+#         nlargest_window=user_preferences.nlargest_window,
+#     )
 
-    results_json = market_analysis.strategy_results()
-    tickers = market_analysis.get_current_month_tickers()
+#     results_json = market_analysis.strategy_results()
+#     tickers = market_analysis.get_current_month_tickers()
 
    
-    UserStrategyModel.objects.update_or_create(
-        user=request.user, defaults={'returns_data': results_json, 'current_tickers' : tickers})
-    equally_portfolio = EqualWeightedPortfolio(user_preferences.balance, tickers)
-    equally_portfolio_data = equally_portfolio.get_chart_data()
+#     UserStrategyModel.objects.update_or_create(
+#         user=request.user, defaults={'returns_data': results_json, 'current_tickers' : tickers})
+#     equally_portfolio = EqualWeightedPortfolio(user_preferences.balance, tickers)
+#     equally_portfolio_data = equally_portfolio.get_chart_data()
 
+
+#     response_data = {
+#         'results': results_json,
+#         'piechart_data': equally_portfolio_data,
+#         'equally_portfolio_data' : equally_portfolio_data
+#     }
+
+#     # response = JsonResponse(results_json, encoder=DjangoJSONEncoder, safe=False)
+
+#     return JsonResponse(response_data)
+
+@login_required(login_url='login')
+def chart_data(request):
+    start_date_str = request.GET.get('start_date')
+    window = int(request.GET.get('window'))
+    nlargest_window = int(request.GET.get('nlargest'))
+    balance = int(request.GET.get('balance'))
+
+    # Przekształć string daty na obiekt datetime
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+
+    # Pobierz lub stwórz preferencje rynkowe użytkownika
+    user_preferences, _ = MarketAnalysisPreferences.objects.get_or_create(user=request.user)
+    user_preferences.start_date = start_date
+    user_preferences.window = window
+    user_preferences.nlargest_window = nlargest_window
+    user_preferences.balance = balance
+    user_preferences.save()
+
+    # Wykonaj analizę rynku i zaktualizuj UserStrategyModel
+    market_analysis = MarketAnalysis(start_date=start_date_str, window=window, nlargest_window=nlargest_window)
+    results_json = market_analysis.strategy_results()
+    tickers = market_analysis.get_current_month_tickers()
+    UserStrategyModel.objects.update_or_create(
+        user=request.user, 
+        defaults={'returns_data': results_json, 'current_tickers': tickers}
+    )
+
+    equally_portfolio = EqualWeightedPortfolio(balance, tickers)
+    equally_portfolio_data = equally_portfolio.get_chart_data()
 
     response_data = {
         'results': results_json,
         'piechart_data': equally_portfolio_data,
-        'equally_portfolio_data' : equally_portfolio_data
+        'equally_portfolio_data': equally_portfolio_data
     }
-
-    # response = JsonResponse(results_json, encoder=DjangoJSONEncoder, safe=False)
 
     return JsonResponse(response_data)
 
