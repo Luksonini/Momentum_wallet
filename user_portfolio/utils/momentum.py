@@ -133,7 +133,7 @@ class MarketAnalysis:
         :param step: krok przeszukiwania
         :return: najlepsze znalezione parametry
         """
-        
+        print(window_range, nlargest_range, self.start_date)
         def objective(params):
             self.window, self.nlargest_window = int(params[0]), int(params[1])
             self.rolling_returns_large = self.calculate_rolling_returns(self.monthly_returns, self.window)
