@@ -94,6 +94,8 @@ function updatePieChart(pieChartData) {
 // Funkcja pobierająca dane wykresu
 function fetchChartData(startDate) {
     clearInterval(intervalID);
+    document.getElementById('strategy-submit-btn').disabled = true;
+    document.getElementById('optimisation-submit-btn').disabled = true;
     document.getElementById('loading-spinner').style.display = 'block';
     document.getElementById('linechart-wrapper').style.display = 'none';
     document.getElementById('piechart-wrapper').style.display = 'none';
@@ -136,6 +138,8 @@ function fetchChartData(startDate) {
             document.getElementById('linechart-wrapper').style.display = 'block';
             document.getElementById('piechart-wrapper').style.display = 'block';
             document.getElementById('ticker-display-container').style.display = 'grid'
+            document.getElementById('strategy-submit-btn').disabled = false;
+            document.getElementById('optimisation-submit-btn').disabled = false;
             intervalID = setInterval(updateTickerDisplay, 60000);
         });
 }
@@ -144,6 +148,8 @@ function fetchChartData(startDate) {
 // Funkcja pobierająca dane do optymalizacji
 function fetchOptimisationData() {
     clearInterval(intervalID);
+    document.getElementById('strategy-submit-btn').disabled = true;
+    document.getElementById('optimisation-submit-btn').disabled = true;
     const startDate = document.getElementById('optimisation-date-input').value;
     const windowValue = document.getElementById('optimisation-window-input').value;
     const nlargestWindow = document.getElementById('optimisation-nlargest-window-input').value;
@@ -180,6 +186,8 @@ function fetchOptimisationData() {
             document.getElementById('linechart-wrapper').style.display = 'block';
             document.getElementById('piechart-wrapper').style.display = 'block';
             document.getElementById('ticker-display-container').style.display = 'grid'
+            document.getElementById('strategy-submit-btn').disabled = false;
+            document.getElementById('optimisation-submit-btn').disabled = false;
             intervalID = setInterval(updateTickerDisplay, 60000);
         });
 }

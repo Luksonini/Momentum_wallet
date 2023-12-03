@@ -6,15 +6,63 @@ This Django-based investment application enables users to manage their investmen
 
 ## Key Features
 
-- **User Authentication:** Secure login, logout, and user registration with Django's built-in mechanisms.
-- **Strategy Management:** Users can input their investment preferences and automatically generate investment strategies.
-- **Market Analysis:** Utilizes historical market data to generate portfolio recommendations.
-- **Strategy Optimization:** Employs parameter optimization to maximize investment returns using the `scipy.optimize` algorithm.
-- **Portfolio Management:** Users can create and adjust an equally-weighted investment portfolio.
-- **User Interaction:** Interactive charts and data provide insights into strategy performance compared to benchmarks like the S&P 500 index.
-- **Watchlist Management:** Enables users to add and remove tickers from a personal watchlist.
-- **Ticker Suggestions:** Offers auto-suggestions for ticker symbols to aid in portfolio assembly or watchlist curation.
-- **User Portfolio API:** Provides detailed portfolio information, including performance metrics and individual entry details.
+
+### Market Analysis and Strategy Optimization
+
+- **Historical Market Data Analysis (`MarketAnalysis` class)**: Utilizes historical market data to generate actionable portfolio suggestions. This class leverages the `scipy.optimize` algorithm for optimizing strategy parameters, enhancing investment returns.
+  - **Code Reference**: `MarketAnalysis` in `market_analysis.py`.
+
+### Advanced Portfolio Management
+
+- **Dynamic Portfolio Adjustment (`EqualWeightedPortfolio` class)**: Enables users to dynamically adjust their portfolio's weight distribution. It integrates `yfinance` for real-time stock price monitoring and utilizes interactive `matplotlib` charts for strategy performance insights.
+  - **Code Reference**: `EqualWeightedPortfolio` in `portfolio_management.py`.
+
+### User Interaction and Insights
+
+- **Interactive Data Visualization**: Provides users with interactive charts and data, using `matplotlib` to offer insights into strategy performance compared to benchmarks like the S&P 500 index.
+  - **Code Reference**: `plot_performance` method in `MarketAnalysis` class.
+
+### User Portfolio API
+
+- **Detailed Portfolio Management (`UserPortfolio_utils` class)**: Allows for in-depth management of a user's portfolio, including adding and removing stocks, and calculating portfolio performance.
+  - **Code Reference**: `UserPortfolio_utils` in `user_portfolio_utils.py`.
+
+### Watchlist Management
+
+- **Personalized Watchlist (`manage_watchlist` API)**: This feature enables users to add and remove tickers from their watchlist, tailoring their investment focus.
+  - **Code Reference**: `manage_watchlist` in `views.py`.
+
+### Ticker Suggestions
+
+- **Auto-Suggestions for Tickers (`ticker_suggestions` API)**: Offers real-time ticker symbol suggestions to aid users in assembling their portfolio or curating their watchlist.
+  - **Code Reference**: `ticker_suggestions` in `views.py`.
+
+### Security and User Authentication
+
+- **Secure User Sessions**: The application ensures user security, particularly for handling sensitive financial data, through Django's secure authentication mechanisms for login, logout, and user registration.
+  - **Code Reference**: `login_view`, `logout_view`, `register` in `views.py`.
+
+### Date Range Customization in Analysis
+
+- **Flexible Date Analysis (`StockData` class)**: Users can customize the date range for market analyses, supported by the `StockData` class's flexible date handling.
+  - **Code Reference**: `StockData` in `stock_data.py`.
+
+### Automated Ticker Updates
+
+- **Real-time Ticker Information Updates**: The application automatically updates ticker information from Wikipedia, ensuring up-to-date S&P 500 company details.
+  - **Code Reference**: `_fetch_tickers` method in `StockData` class.
+
+### Portfolio Transaction History
+
+- **Detailed Transaction Tracking (`UserPortfolio_utils` class)**: Users can track their portfolio transaction history and changes, facilitated by the detailed tracking in `UserPortfolio_utils`.
+  - **Code Reference**: `add_ticker_to_portfolio`, `remove_ticker_from_portfolio` in `UserPortfolio_utils`.
+
+### Adaptive Investment Suggestions
+
+- **Responsive Investment Recommendations**: The application adapts its investment suggestions based on current market trends and user preferences.
+  - **Code Reference**: Strategy generation methods in `MarketAnalysis`.
+
+---
 
 ## Installation
 
@@ -121,6 +169,8 @@ Your contributions are welcome! Please fork the repository and submit a pull req
 ### `StockData`:
 
 - A helper class for fetching and processing stock market data for market analysis.
+
+
 
 ## License
 
