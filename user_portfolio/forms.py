@@ -48,21 +48,13 @@ class OptimisationPreferencesForm(forms.ModelForm):
         fields = ['optimisation_date', 'window', 'nlargest_window']
 
 
-# class PortfolioEntryForm(forms.ModelForm):
-#     class Meta:
-#         model = PortfolioEntry
-#         fields = ['ticker_symbol', 'purchase_price', 'quantity']
-#         widgets = {
-#             'ticker_symbol': forms.TextInput(attrs={
-#                 'class': 'hidden',   
-#             }),
-#             'purchase_price': forms.NumberInput(attrs={
-#                 'class': 'hidden',
-#                 'id' : 'puthase_price'
-               
-#             }),
-#             'quantity': forms.NumberInput(attrs={
-#                 'class': 'mt-1 block w-full border-2 border-gray-300 bg-white py-2 px-4 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
-#                 'id' : 'quantity'
-#             }),
-#         }
+class PortfolioCreationForm(forms.Form):
+    initial_cash = forms.DecimalField(
+        label='Initial Portfolio Cash',
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'w-1/4 text-center text-4xl appearance-none bg-transparent border-b-2 border-[#a28834] text-[#61521f] text-xl w-full  mr-3 py-3 px-2 leading-tight focus:outline-none', 'placeholder': 'Enter Initial Cash'})  # Add your CSS class here
+    )
+
+

@@ -1,17 +1,16 @@
-// Przygotuj zmienną na wykres, aby była dostępna globalnie
+// Global variables for charts and interval
 var myChart;
 var myPieChart; 
 var intervalID;
 
-// Funkcja aktualizująca wykres
-    // Funkcja aktualizująca wykres
-    function updateChart(chartData) {
-        // Usuń istniejący wykres, jeśli istnieje
-        if (myChart) {
-            myChart.destroy();
-        }
-    
-        // Stwórz nowy wykres z nowymi danymi
+// Function to update the line chart
+function updateChart(chartData) {
+    // Destroy existing chart if present
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    // Create a new chart with new data
         var ctx = document.getElementById('myChart').getContext('2d');
         myChart = new Chart(ctx, {
             type: 'line',
@@ -67,12 +66,13 @@ var intervalID;
 
 
 
-// Funkcja aktualizująca wykres kołowy
+// Function to update the pie chart
 function updatePieChart(pieChartData) {
-    // Usuń istniejący wykres kołowy, jeśli istnieje
+    // Destroy existing pie chart if present
     if (myPieChart) {   
         myPieChart.destroy();
     }
+     // Create a new pie chart
     var ctxPie = document.getElementById('myPieChart').getContext('2d');
     myPieChart = new Chart(ctxPie, {
         type: 'doughnut',
@@ -81,7 +81,6 @@ function updatePieChart(pieChartData) {
             datasets: [{
                 label: 'Portfolio Distribution',
                 data: pieChartData.data,
-                // backgroundColor i borderColor zostały usunięte, więc będą użyte domyślne kolory
                 borderWidth: 1
             }]
         },
@@ -91,8 +90,9 @@ function updatePieChart(pieChartData) {
     });
 }
 
-// Funkcja pobierająca dane wykresu
+// Function to fetch chart data
 function fetchChartData(startDate) {
+     // Preparation and API call logic
     clearInterval(intervalID);
     document.getElementById('strategy-submit-btn').disabled = true;
     document.getElementById('optimisation-submit-btn').disabled = true;
@@ -106,12 +106,11 @@ function fetchChartData(startDate) {
     const balance = document.getElementById('start-calital-input').value;
 
     
-    // Aktualizuj UI i wartości formularza bezpośrednio tutaj
+    // Finalize by setting up the UI and interval
     document.getElementById('user-preferences-start-date').textContent = startDate;
     document.getElementById('user-preferences-nlargest').textContent = nlargestWindow;
     document.getElementById('user-preferences-window').textContent = windowValue;
 
-    // Utwórz parametry dla żądania
     const params = new URLSearchParams({
         start_date: startDate,
         window: windowValue,
@@ -119,7 +118,7 @@ function fetchChartData(startDate) {
         balance: balance
     });
 
-    // Użyj zmiennej `startDate` jako części URL w żądaniu GET
+    // Function to fetch optimisation data
     fetch('/chart-data/?' + params.toString())
         .then(response => response.json())
         .then(data => {
@@ -145,8 +144,9 @@ function fetchChartData(startDate) {
 }
 
 
-// Funkcja pobierająca dane do optymalizacji
+// Function to fetch optimisation data
 function fetchOptimisationData() {
+    // Preparation and API call logic
     clearInterval(intervalID);
     document.getElementById('strategy-submit-btn').disabled = true;
     document.getElementById('optimisation-submit-btn').disabled = true;
@@ -154,7 +154,7 @@ function fetchOptimisationData() {
     const windowValue = document.getElementById('optimisation-window-input').value;
     const nlargestWindow = document.getElementById('optimisation-nlargest-window-input').value;
     
-    // Utwórz parametry dla żądania
+
     const params = new URLSearchParams({
         optimisation_date: startDate,
         window: windowValue,
@@ -165,7 +165,7 @@ function fetchOptimisationData() {
     document.getElementById('linechart-wrapper').style.display = 'none';
     document.getElementById('piechart-wrapper').style.display = 'none';
     document.getElementById('ticker-display-container').style.display = 'none'
-    // Wyślij żądanie z parametrami
+    
     fetch('/optimisation-data/?' + params.toString())
         .then(response => response.json())
         .then(data => {
@@ -181,6 +181,7 @@ function fetchOptimisationData() {
         .catch(error => {
             console.error('Error:', error);
         })
+        // Finalize by setting up the UI and interval
         .finally(() => {
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('linechart-wrapper').style.display = 'block';
@@ -192,14 +193,13 @@ function fetchOptimisationData() {
         });
 }
 
+// Function to update stock date display
 function updateStocksDate() {
-    // Pobranie obecnej daty
+     // Update the date display for stocks
     const currentDate = new Date();
 
-    // Formatowanie daty
     const formattedDate = currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
-    // Znalezienie elementu w DOM i aktualizacja jego zawartości
     const dateElement = document.getElementById('stocks-date');
     if (dateElement) {
         dateElement.textContent = 'Top stocks for ' + formattedDate;
@@ -208,32 +208,33 @@ function updateStocksDate() {
     }
 }
 
+// Function to set new values in the form based on user preferences
 function setNewFormValues() {
-    // Pobierz wartość z elementu span i ustaw ją jako value dla inputa 'nlargest_window'
+    // Set new values in form inputs'
     const nLargestValue = document.getElementById('user-preferences-nlargest').textContent;
     const nLargestInput = document.getElementById('start-nlargest-window-input');
     if (nLargestInput && nLargestValue) {
-      nLargestInput.value = parseInt(nLargestValue, 10); // Używamy parseInt, aby upewnić się, że wartość jest liczbą całkowitą
+      nLargestInput.value = parseInt(nLargestValue, 10); 
     }
-  
-    // Pobierz wartość z elementu span i ustaw ją jako value dla inputa 'window'
     const windowValue = document.getElementById('user-preferences-window').textContent;
     const windowInput = document.getElementById('start-window-input');
     if (windowInput && windowValue) {
-      windowInput.value = parseInt(windowValue, 10); // To samo tutaj
+      windowInput.value = parseInt(windowValue, 10); 
     }
   }
 
+  // Function to populate ticker data
 function populateTickerData(data) {
+    // Populate ticker data into the ticker display container
     const container = document.getElementById('ticker-display-container');
-    container.innerHTML = ''; // Czyść kontener przed dodaniem nowych elementów
+    container.innerHTML = ''; 
     {
         const container = document.getElementById('ticker-display-container');
         container.className = 'w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-5';
 
         Object.entries(data).forEach(([ticker, info]) => {
             const tickerAnchor = document.createElement('a');
-            tickerAnchor.href = `/ticker_detail/${ticker}/`; // Ustaw adres URL
+            tickerAnchor.href = `/portfolio/${ticker}/`; 
             tickerAnchor.className = 'bg-white shadow rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 transform hover:scale-105';
             tickerAnchor.style.textDecoration = 'none';
             tickerAnchor.style.backfaceVisibility = 'hidden';
@@ -269,7 +270,7 @@ function populateTickerData(data) {
             percentChange.id = `percent-${ticker}`; 
 
             [logoImg, tickerSymbol, companyName, currentPrice, priceChange, percentChange].forEach(el => {
-                tickerAnchor.appendChild(el); // Dodaj elementy do anchor tag
+                tickerAnchor.appendChild(el); 
             });
 
             container.appendChild(tickerAnchor);
@@ -277,8 +278,9 @@ function populateTickerData(data) {
         }
     }
  
-
+// Function to create ticker display
 function createTickerDisplay() {
+// Create ticker display and set interval
 const savedData = localStorage.getItem('tickerData');
 if (savedData) {
     populateTickerData(JSON.parse(savedData));
@@ -300,8 +302,10 @@ fetch('/tickers_info/')
     console.error('Could not fetch ticker data:', error);
     });
 }
-  
+
+// Function to update ticker display
 function updateTickerDisplay() {
+// Update ticker display with latest information
     fetch('/tickers_info/')
       .then(response => {
         if (!response.ok) {
@@ -312,7 +316,6 @@ function updateTickerDisplay() {
       .then(data => {
         localStorage.setItem('tickerData', JSON.stringify(data));
         Object.entries(data).forEach(([ticker, info]) => {
-          // Zaktualizuj istniejące elementy, jeśli istnieją
 
           const currentPriceElement = document.getElementById(`price-${ticker}`);
           const priceChangeElement = document.getElementById(`change-${ticker}`);
@@ -334,55 +337,10 @@ function updateTickerDisplay() {
       });
   }
 
-//   function handleSubmitPortfolioForm() {
-//     const form = document.querySelector('#purchase-container form');
-    
-//     form.addEventListener('submit', function(event) {
-//         event.preventDefault();
 
-//         // Zbieranie danych z formularza
-//         const formData = new FormData(form);
-//         const data = {
-//             'ticker_symbol': formData.get('ticker_symbol'),
-//             'purchase_price': formData.get('purchase_price'),
-//             'quantity': formData.get('quantity'),
-//             'csrfmiddlewaretoken': formData.get('csrfmiddlewaretoken')  // Wartość tokena CSRF
-//         };
-
-//         // Wysyłanie danych do API
-//         fetch('/ścieżka-do-user_portfolio_api/', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRFToken': data.csrfmiddlewaretoken  // Wymagane dla Django CSRF
-//             },
-//             body: JSON.stringify(data)
-//         })
-//         .then(response => {
-//             if (!response.ok) {
-//                 throw new Error(`HTTP error! status: ${response.status}`);
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('Success:', data);
-//             // Tutaj możesz obsłużyć dane zwrotne, np. aktualizując UI
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//         });
-//     });
-// }
-
+// Event listener for DOM content loaded
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // Tutaj możesz wywołać inne funkcje inicjalizujące
-});
-  
-
-// Obsługa zdarzeń formularza
-document.addEventListener('DOMContentLoaded', function() {
-    // handleSubmitPortfolioForm();
+    // Initial setup and event listeners
     document.getElementById('loading-spinner').style.display = 'none';
     document.getElementById('strategy-form').addEventListener('submit', function(event) {
         event.preventDefault();
@@ -398,6 +356,5 @@ document.addEventListener('DOMContentLoaded', function() {
     updateStocksDate();
     setNewFormValues();
 
-    // Rozpoczęcie interwału
     intervalID = setInterval(updateTickerDisplay, 60000);
 });

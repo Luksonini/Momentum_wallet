@@ -3,9 +3,9 @@
 
 {% block body %}
 <section class="w-screen h-screen p-5 flex section-heroe sm:items-satrt">
-  <div class="flex mx-auto gap-[20rem] mt-[10rem]">
+  <div class="flex mx-auto gap-[10rem] mt-[10rem]">
       <div class="heroe-text-box text-xl leading-10 sm:flex-col flex-0 flex flex-col justify-start">
-          <h1 class="text-6xl font-bold sm:text-[5rem]">
+          <h1 class="text-6xl font-bold sm:text-[5rem] mt-10">
               Invest with Momentum: <br> Build a Stronger Portfolio
           </h1>
           <p class="heroe-description text-2xl leading-10 sm:leading-[4rem] py-10 sm:text-[2.5rem]">
@@ -19,13 +19,13 @@
       </div>
       <div class="hidden lg:flex flex-col heroe-image-box flex-1">
           <img
-              class=" md:max-h-[40rem] heroe-img flex-0"
+              class=" md:max-h-[50rem] heroe-img flex-0"
               src="{% static 'user_portfolio/images/heroe.png' %}"
               alt="The graphics of the people happy from growing investment incomes"
           />
           <div class="hidden lg:flex flex-0 heroe-logos max-h-[5rem] justify-center gap-20 mx-10">
-              <img class="max-w-[8rem]" src="{% static 'user_portfolio/images/NYSE.png' %}" alt="NYSE Logo" />
-              <img class="max-w-[10rem]" src="{% static 'user_portfolio/images/GPW.png' %}" alt="GPW Logo" />
+              <img class="max-w-[7rem]" src="{% static 'user_portfolio/images/NYSE.png' %}" alt="NYSE Logo" />
+              <img class="max-w-[13rem]" src="{% static 'user_portfolio/images/GPW.png' %}" alt="GPW Logo" />
               <img class="max-w-[8rem]" src="{% static 'user_portfolio/images/binance.png' %}" alt="Binance Logo" />
           </div>
       </div>

@@ -3,9 +3,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import StrategyInputForm, OptimisationPreferencesForm
+from .forms import StrategyInputForm, OptimisationPreferencesForm, PortfolioCreationForm
 from .models import User, UserStrategyModel, MarketAnalysisPreferences, MappedTickers, Portfolio, Watchlist
 from .utils.momentum import MarketAnalysis
 from .utils.calculate_weights import EqualWeightedPortfolio
@@ -148,12 +148,40 @@ def tickers_info(request):
 
     return JsonResponse(ticker_info)
 
+
 @login_required(login_url='login')
-def ticker_detail(request, ticker):
+def portfolio(request, ticker=''):
+    try:
+        # Try to get the existing portfolio
+        portfolio = Portfolio.objects.get(user=request.user)
+        # If a portfolio is found, we do not need to create a new one
+        portfolio_created = True
+    except Portfolio.DoesNotExist:
+        # If a portfolio does not exist, we will indicate that one needs to be created
+        portfolio = None
+        portfolio_created = False
+
+    form = PortfolioCreationForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid() and not portfolio_created:
+            initial_cash = form.cleaned_data['initial_cash']
+            # Create a new portfolio instance with the initial cash
+            Portfolio.objects.create(
+                user=request.user,
+                available_cash=initial_cash,
+                initial_portfolio_value=initial_cash
+            )
+            return redirect('portfolio', ticker=ticker)
+
+        if 'delete_portfolio' in request.POST:
+            if portfolio:
+                portfolio.delete()
+                return redirect('portfolio', ticker=ticker)
+    
     strategy_tickers = UserStrategyModel.objects.filter(user=request.user).first()
     strategy_tickers = json.loads(strategy_tickers.current_tickers) if strategy_tickers and strategy_tickers.current_tickers else []
     company_names = {}
-    print(ticker)
     for strategy_ticker in strategy_tickers:
         formatted_ticker = strategy_ticker.replace('.', '-') if '.' in strategy_ticker else strategy_ticker
         mapped_tickers = MappedTickers.objects.filter(ticker=formatted_ticker).first()
@@ -166,13 +194,13 @@ def ticker_detail(request, ticker):
     filter = MappedTickersFilter(request.GET, queryset=MappedTickers.objects.all())
 
     return render(request, "user_portfolio/portfolio.html", {
+        'form': form if not portfolio_created else None,
         'ticker': ticker, 
         'strategy_tickers_dict': company_names,
         'watchlist_tickers': watchlist_tickers,
         'filter': filter,
+        'portfolio_created': portfolio_created,
     })
-
-# watchlist
 
 
 def manage_watchlist(request):
@@ -180,8 +208,6 @@ def manage_watchlist(request):
         data = json.loads(request.body)
         action = data.get('action')
         ticker = data.get('ticker')
-        print(action)
-        print(ticker)
 
         if action == 'add':
             watchlist_ticker = MappedTickers.objects.filter(ticker=ticker).first()

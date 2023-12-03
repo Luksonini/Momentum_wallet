@@ -1,5 +1,37 @@
 # Investment Portfolio Application
 
+## User Registration Screen
+
+Below is the user registration screen of the Capybara Investments platform. This is the first step for new users to create an account, granting access to personalized investment strategy tools and portfolio management. The design emphasizes clarity and ease of use, inviting users to join the Capybara community.
+
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/f9c47241-d8f7-4146-81d3-17f61463d98f" alt="User Registration Screen" width="100%"/>
+</div>
+
+## Main Dashboard
+
+The screenshot below showcases the main dashboard of the Capybara Investments platform. It's designed to welcome users with an intuitive layout, providing quick access to essential features like 'Momentum' and 'Portfolio'. The vibrant illustration emphasizes our commitment to helping users build a stronger financial future with accessible high-quality investment advice.
+
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/136f334b-2f87-4d40-9eee-ac944f623664" alt="Main Dashboard" width="100%"/>
+</div>
+
+## Momentum Strategy Optimization
+
+The image below displays the Momentum Optimization page of the Capybara Investments platform, where users can fine-tune their investment strategies. This page allows users to set and adjust parameters such as the evaluation window, the number of top-performing stocks to consider, and the available capital for investment. The interactive graph provides a visual representation of the strategy's performance against the US500 returns, offering an intuitive way to compare and optimize investment strategies for better decision-making.
+
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/a7eecadd-731d-4a2b-844c-b3684726b0f1" alt="Momentum Strategy Optimization" width="100%"/>
+</div>
+
+## Portfolio Management Interface
+
+The screenshot illustrates the Portfolio Management interface of the Capybara Investments platform, a central feature where users can view and manage their individual stock holdings. The page presents a detailed table with information on company holdings, quantities, purchase prices, current values, and performance indicators such as price and percentage changes. Actions such as selling stocks can be performed directly from this interface. Above the table, an interactive stock chart for a selected company, such as Apple Inc. in this instance, shows historical price data, allowing users to visualize stock performance over time.
+
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/333e2acf-8b30-4c57-aeca-1203094d25ee" alt="Portfolio Management Interface" width="100%"/>
+</div>
+
 ## Overview
 
 This Django-based investment application enables users to manage their investment strategies and portfolio with ease. It provides robust market analysis, strategy optimization, and portfolio management features. Users can personalize their investment strategies, track market performance, and stay informed with real-time ticker suggestions.
@@ -128,7 +160,7 @@ Your contributions are welcome! Please fork the repository and submit a pull req
 
 - An API endpoint that provides information about the tickers in the user's portfolio.
 
-### `ticker_detail`:
+### `portfolio`:
 
 - Renders a page with detailed information about the selected ticker, user strategies, and watchlist.
 

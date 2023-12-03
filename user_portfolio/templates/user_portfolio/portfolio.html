@@ -70,6 +70,25 @@
   <form method="get" id="searching-form" class="h-[200px] overflow-auto max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" style="display: none;">
     {{ filter.form.as_p | safe }}
   </form>
+  {% if not portfolio_created %}
+  <hr class="w-3/4 mx-auto border-2 border-[#25174B]">
+  <div class="portfolio-creation">
+    <form method="post" id="portfolio-creation-form" class="flex flex-col">
+      {% csrf_token %}
+  
+      <div class="mb-4 md:mb-0 w-full text-center">
+        <p class="font-bold text-center p-2">Portfolio:</p>
+        <p id='in-case-no-tickers'>No avaliable portfolios, please create one below:</p>
+          {{ form.initial_cash }}
+      </div>
+
+      <button type="submit" class="w-[200px] mx-auto bg-[#a28834] text-white hover:bg-[#796832] font-bold uppercase text-md px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          Create Portfolio
+      </button>
+    </form>
+  </div>
+{% endif %}
+
   <div id="purchase-container" class="container mx-auto px-4 " style='display: none;'>
 
     <form id="append-to-portfolio-form" class="relative min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post" >
@@ -104,9 +123,20 @@
     </form>
 </div>
 
+
   <div id="portfolio-display-container" class="container mx-auto md:px-0"></div>
 
   <input type="text" name="ticker_price" value="{{ request.GET.ticker }}" />
+{% if portfolio_created %}
+  <!-- Delete Portfolio Button -->
+  <form method="post" class="mx-auto text-center" action="{% url 'portfolio' ticker=ticker %}"> 
+      {% csrf_token %}
+      <input type="hidden" name="delete_portfolio" value="1">
+      <button type="submit" class="w-[200px] mx-auto bg-[#a28834] text-white hover:bg-[#796832] font-bold uppercase text-md px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" onclick="return confirm('Are you sure you want to delete your portfolio? This action cannot be undone.');">
+          Delete Portfolio
+      </button>
+  </form>
+{% endif %}
   <script>
     window.displayed_ticker = "{{ ticker|safe }}"
     window.csrfToken = "{{ csrf_token }}";

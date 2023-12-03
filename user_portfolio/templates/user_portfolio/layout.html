@@ -39,7 +39,7 @@
           <ul class="flex flex-col sm:flex-row flex-1 gap-5 sm:gap-10">
             <!-- Your right side links go here -->
             <li>
-              <a href="{% url 'ticker_detail' ticker='AAPL' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Portfolio</a>
+              <a href="{% url 'portfolio' ticker='AAPL' %}" class="text-gray-100 sm:font-semibold uppercase tracking-widest hover:text-gray-300">Portfolio</a>
             </li>
             {% if user.is_authenticated %}
               <li>
