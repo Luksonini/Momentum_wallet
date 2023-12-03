@@ -50,7 +50,6 @@ Q_CLUSTER = {
 
 INSTALLED_APPS = [
     "user_portfolio",
-    "rest_framework",
     "django_filters",
     "django.contrib.admin",
     "django.contrib.auth",
