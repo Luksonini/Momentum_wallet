@@ -96,6 +96,26 @@ This Django-based investment application enables users to manage their investmen
 
 ---
 
+## API Key Configuration for Ticker Mapping
+
+### Using External APIs for Ticker Information
+
+The `maptickers` command in this application relies on external APIs from `https://api-ninjas.com/` and `https://polygon.io/stocks` to fetch and map ticker information accurately. To ensure the command functions correctly, you need to use your own API keys for these services.
+
+### Obtaining API Keys
+
+- **API-Ninjas**: Visit [API-Ninjas](https://api-ninjas.com/) and sign up to obtain a free API key. Note that the free tier has request limitations.
+- **Polygon.io**: Go to [Polygon.io](https://polygon.io/stocks) and register for an API key. They also offer a free tier with certain usage restrictions.
+
+### Configuring Your Application
+
+1. After obtaining the API keys, open your application's `settings.py` file.
+2. Add the following configuration parameters:
+
+   ```python
+   API_NINJAS_KEY = 'your_api-ninjas_key_here'
+   POLYGON_IO_KEY = 'your_polygon.io_key_here'
+
 ## Installation
 
 To get started with this investment application, follow the installation steps below:
