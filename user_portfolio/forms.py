@@ -54,7 +54,7 @@ class PortfolioCreationForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         min_value=0,
-        widget=forms.NumberInput(attrs={'class': 'w-1/4 text-center text-4xl appearance-none bg-transparent border-b-2 border-[#a28834] text-[#61521f] text-xl w-full  mr-3 py-3 px-2 leading-tight focus:outline-none', 'placeholder': 'Enter Initial Cash'})  # Add your CSS class here
+        widget=forms.NumberInput(attrs={'class': 'w-1/2 sm:w-1/4 text-center text-2xl appearance-none bg-transparent border-b-2 border-[#a28834] text-[#61521f] w-full  mr-3 py-3 px-2 leading-tight focus:outline-none', 'placeholder': 'Enter Initial Cash'})  
     )
 
 

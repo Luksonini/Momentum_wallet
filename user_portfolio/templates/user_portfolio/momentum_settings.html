@@ -1,5 +1,6 @@
 {% extends "user_portfolio/layout.html" %}
 {% load static %}
+{% block title %}Momentum settings{% endblock %}
 {% block body %}
     <div class="w-full max-w-2xl mx-auto my-8 flex flex-col items-center text-center text-2xl">
         <div class="w-full mx-auto">
@@ -45,7 +46,7 @@
                 {{ strategy_form.balance }}
             </div>
              <!-- Submit button -->
-            <button id="strategy-submit-btn" type="submit" class="mt-4 md:mt-0 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300 ease-in-out w-full md:w-auto">
+            <button id="strategy-submit-btn" type="submit" class="w-[200px] mx-auto bg-[#a28834] text-white hover:bg-[#796832] text-md px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"">
                 Submit
             </button>
             
@@ -78,7 +79,7 @@
                 {{ optimisation_form.nlargest_window }}
             </div>
             <!-- Submit button -->
-            <button id="optimisation-submit-btn" type="submit" class="mt-4 md:mt-0 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300 ease-in-out w-full md:w-auto">
+            <button id="optimisation-submit-btn" type="submit" class="w-[200px] mx-auto bg-[#a28834] text-white hover:bg-[#796832] text-md px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
                 Submit
             </button>
         </form>

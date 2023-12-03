@@ -17,8 +17,7 @@ function populatePortfolioData(responseData) {
   headers.forEach((headerText, index) => {
   const header = document.createElement('div');
   header.textContent = headerText;
-  header.className = 'md:col-span-1'; // Klasa dla większych ekranów
-  // Ukryj kolumny 'Quantity', 'Purchase Price', 'Current Price', i 'Value' na mniejszych ekranach
+  header.className = 'md:col-span-1'; 
   if (['Quantity', 'Purchase Price', 'Current Price', 'Value'].includes(headerText)) {
     header.className += ' hidden sm:block';
   }
@@ -39,11 +38,11 @@ Object.entries(portfolioData).forEach(([ticker, info]) => {
     // Create two separate elements for ticker and company name
     const tickerDiv = document.createElement('div');
     tickerDiv.textContent = ticker;
-    tickerDiv.className = 'block sm:hidden'; // Tylko ticker będzie widoczny na małych ekranach
+    tickerDiv.className = 'block sm:hidden'; 
 
     const companyNameDiv = document.createElement('div');
     companyNameDiv.textContent = info.company_name;
-    companyNameDiv.className = 'hidden md:block'; // Pełna nazwa firmy będzie ukryta na małych ekranach
+    companyNameDiv.className = 'hidden md:block'; 
 
     // Add both ticker and company name to the company info div
     companyInfoDiv.appendChild(tickerDiv);
@@ -51,20 +50,6 @@ Object.entries(portfolioData).forEach(([ticker, info]) => {
 
     rowDiv.appendChild(companyInfoDiv);
 
-      // Rest of the data
-      // headers.slice(1, -1).forEach(header => { // Skip the last 'Action' header
-      //     const cellDiv = document.createElement('div');
-      //     let textContent = info[header.toLowerCase().replace(/ /g, '_')];
-      //     if (typeof textContent === 'number') {
-      //         textContent = textContent.toFixed(2) + '$';
-      //     }
-      //     cellDiv.textContent = textContent;
-      //     cellDiv.className = 'col-span-1';
-      //     if (header === 'Price Change' || header === 'Percent Change') {
-      //         cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
-      //     }
-      //     rowDiv.appendChild(cellDiv);
-      // });
       headers.slice(1, -1).forEach(header => { // Skip the last 'Action' header
         const cellDiv = document.createElement('div');
         let textContent = info[header.toLowerCase().replace(/ /g, '_')];
@@ -73,13 +58,17 @@ Object.entries(portfolioData).forEach(([ticker, info]) => {
         }
         cellDiv.textContent = textContent;
         cellDiv.className = 'sm:col-span-1';
-        // Dodaj klasę "hidden md:block" dla kolumny 'Quantity', 'Purchase Price', 'Current Price', i 'Value'
         if (['Quantity', 'Purchase Price', 'Current Price', 'Value'].includes(header)) {
           cellDiv.className += ' hidden sm:block';
         }
-        // Dodatkowe style dla zmiany koloru tekstu
         if (header === 'Price Change' || header === 'Percent Change') {
-          cellDiv.className += ` text-${textContent < 0 ? 'red' : 'green'}-500`;
+          let numericValue = parseFloat(textContent);
+          if (!isNaN(numericValue)) {
+            textContent = numericValue.toFixed(4);
+            textContent += '$';
+            cellDiv.className += ` text-${numericValue < 0 && numericValue !== 0 ? 'red' : 'green'}-500`;
+          }
+          cellDiv.textContent = textContent;
         }
         rowDiv.appendChild(cellDiv);
       });
@@ -152,6 +141,9 @@ function createPerformanceDetail(label, value) {
  * It requests the user's portfolio data from the server and updates the UI accordingly.
  */
 function createPortfolioDisplay() {
+  if (!window.portfolio_created) {
+    return; 
+}
   fetch('/user_portfolio_api/')
       .then(response => {
           if (!response.ok) {
@@ -169,6 +161,9 @@ function createPortfolioDisplay() {
  * @param {HTMLElement} button - The button element that was clicked to sell the stock.
  */
 function handleSellTicker(button) {
+  if (!window.portfolio_created) {
+    return; 
+ }
   const ticker = button.getAttribute('data-ticker');
   const currentPrice = button.getAttribute('data-current-price')
   const data = {
@@ -250,19 +245,24 @@ function widgetOnTickerClick() {
  * @param {string} ticker - The ticker symbol for the stock.
  */
 function changeFormDisplayButton(ticker) {
-  const buyStockDisplayButton = document.getElementById('buy-stock-display-button');
-  const purchaseContainer = document.getElementById('purchase-container');
-  fetchTickerPrice(ticker)
+  if (window.portfolio_created) {
+    const buyStockDisplayButton = document.getElementById('buy-stock-display-button');
+    const purchaseContainer = document.getElementById('purchase-container');
+    
+    // Call the function to fetch the ticker price.
+    fetchTickerPrice(ticker);
 
-  buyStockDisplayButton.style.display = 'block';
-  
-  buyStockDisplayButton.innerHTML = `Buy ${ticker}`;
+    // Set the button display to block and update its text.
+    buyStockDisplayButton.style.display = 'block';
+    buyStockDisplayButton.innerHTML = `Buy ${ticker}`;
 
-  buyStockDisplayButton.onclick = function () {
-    // Pokaż kontener zakupu jeśli był ukryty
-    if (purchaseContainer.style.display === 'none') {
-      purchaseContainer.style.display = 'block';
-      buyStockDisplayButton.style.display = 'none';
+    // Set the onclick event for the button.
+    buyStockDisplayButton.onclick = function () {
+      // Toggle the display of the purchase container.
+      if (purchaseContainer.style.display === 'none') {
+        purchaseContainer.style.display = 'block';
+        buyStockDisplayButton.style.display = 'none';
+      }
     }
   }
 }
@@ -521,7 +521,7 @@ function calculateTotalPrice(pricePerShare) {
       // Disable the 'Buy' button and change its style
       buyButton.disabled = true;
       buyButton.classList.add('bg-gray-400', 'cursor-not-allowed');
-      buyButton.classList.remove('bg-green-500', 'hover:bg-green-700');
+      buyButton.classList.remove('bg-[#a28834]', 'hover:bg-[#796832]');
   } else {
       // If the alert box exists and the total price is less than available cash, remove the alert box
       if (alertBox) {
@@ -530,7 +530,7 @@ function calculateTotalPrice(pricePerShare) {
       // Enable the 'Buy' button and reset its style
       buyButton.disabled = false;
       buyButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-      buyButton.classList.add('bg-green-500', 'hover:bg-green-700');
+      buyButton.classList.add('bg-[#a28834]', 'hover:bg-[#796832]');
   }
 }
 
@@ -545,6 +545,11 @@ function handleAppendTickerToPortfolioForm() {
   
   form.addEventListener('submit', function(event) {
       event.preventDefault();
+
+      if (!window.portfolio_created) {
+        console.log('Portfel nie istnieje. Proszę najpierw stworzyć portfel.');
+        return; 
+    }
 
       // Zbieranie danych z formularza
       const formData = new FormData(form);

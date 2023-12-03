@@ -1,7 +1,13 @@
-from django.contrib import admin
-from .models import *
 
-# Rejestrowanie modeli w panelu admina Django
+from .models import *
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    pass
+
 @admin.register(UserStrategyModel)
 class UserStrategyModelAdmin(admin.ModelAdmin):
     list_display = ('user', 'returns_data', 'current_tickers')

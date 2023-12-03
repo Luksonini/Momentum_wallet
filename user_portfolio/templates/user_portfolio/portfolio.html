@@ -1,5 +1,6 @@
 {% extends "user_portfolio/layout.html" %}
 {% load static %}
+{% block title %}Capybara Investments{% endblock %}
 {% block scripts %}
   <script src="{% static 'user_portfolio/js/portfolio.js' %}"></script>
 {% endblock scripts %}
@@ -91,7 +92,7 @@
 
   <div id="purchase-container" class="container mx-auto px-4 " style='display: none;'>
 
-    <form id="append-to-portfolio-form" class="relative min-h-[200px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post" >
+    <form id="append-to-portfolio-form" class="relative min-h-[150px] max-w-lg mx-auto bg-white p-6 mb-5 rounded-lg shadow" method="post" >
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         
         <div>
@@ -110,13 +111,13 @@
             <label class='m-0' for="id_quantity">Shares:</label>
             <!-- Pole tekstowe dla ilości akcji -->
             <input type="number" name="quantity" id="quantity" 
-            class="mt-1 block w-full border-2 border-gray-300 bg-white py-2 px-4 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+            class="text-3xl mt-1 block w-full border-2 border-gray-300 bg-white px-4 shadow-sm focus:outline-none focus:ring focus:border-blue-500" 
             min="0.1" step="0.01" required>
         </div>
         
         <!-- Element do wyświetlania całkowitej ceny -->
         <p id="total-price"></p> 
-        <button id='buy-button' type="submit" class="absolute bottom-2 right-6 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        <button id='buy-button' type="submit" class="absolute bottom-2 right-6 mx-auto bg-[#a28834] text-white hover:bg-[#796832] font-bold uppercase text-md px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ">
           Buy
         </button>
       </div>
@@ -140,6 +141,7 @@
   <script>
     window.displayed_ticker = "{{ ticker|safe }}"
     window.csrfToken = "{{ csrf_token }}";
+    window.portfolio_created = {{ portfolio_created|yesno:"true,false" }};
     window.currentPricePerShare = 0;
     document.addEventListener('DOMContentLoaded', function() {
       createPortfolioDisplay();
