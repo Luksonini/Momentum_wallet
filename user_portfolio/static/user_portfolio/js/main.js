@@ -23,7 +23,7 @@ function updateChart(chartData) {
                     data: chartData.map(function(item) { return item.US500_returns; }),
                     fill: false,
                 }, {
-                    label: 'Strategy',
+                    label: 'Strategy returns simulation',
                     backgroundColor: 'rgb(54, 162, 235)',
                     borderColor: 'rgb(54, 162, 235)',
                     data: chartData.map(function(item) { return item.strategy; }),
@@ -100,6 +100,7 @@ function fetchChartData(startDate) {
     document.getElementById('linechart-wrapper').style.display = 'none';
     document.getElementById('piechart-wrapper').style.display = 'none';
     document.getElementById('ticker-display-container').style.display = 'none';
+    document.getElementById('live-price-paragraph').style.display = 'none';
 
     const windowValue = document.getElementById('start-window-input').value;
     const nlargestWindow = document.getElementById('start-nlargest-window-input').value;
@@ -137,8 +138,11 @@ function fetchChartData(startDate) {
             document.getElementById('linechart-wrapper').style.display = 'block';
             document.getElementById('piechart-wrapper').style.display = 'block';
             document.getElementById('ticker-display-container').style.display = 'grid'
+            document.getElementById('live-price-paragraph').style.display = 'block';
             document.getElementById('strategy-submit-btn').disabled = false;
             document.getElementById('optimisation-submit-btn').disabled = false;
+            // document.getElementById('myChart').style = "width: 720px; height: 480px; display: block; box-sizing: border-box;"
+
             intervalID = setInterval(updateTickerDisplay, 60000);
         });
 }
@@ -165,6 +169,7 @@ function fetchOptimisationData() {
     document.getElementById('linechart-wrapper').style.display = 'none';
     document.getElementById('piechart-wrapper').style.display = 'none';
     document.getElementById('ticker-display-container').style.display = 'none'
+    document.getElementById('live-price-paragraph').style.display = 'none';
     
     fetch('/optimisation-data/?' + params.toString())
         .then(response => response.json())
@@ -187,6 +192,7 @@ function fetchOptimisationData() {
             document.getElementById('linechart-wrapper').style.display = 'block';
             document.getElementById('piechart-wrapper').style.display = 'block';
             document.getElementById('ticker-display-container').style.display = 'grid'
+            document.getElementById('live-price-paragraph').style.display = 'block';
             document.getElementById('strategy-submit-btn').disabled = false;
             document.getElementById('optimisation-submit-btn').disabled = false;
             intervalID = setInterval(updateTickerDisplay, 60000);
@@ -233,6 +239,7 @@ function populateTickerData(data) {
         container.className = 'w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-5';
 
         Object.entries(data).forEach(([ticker, info]) => {
+
             const tickerAnchor = document.createElement('a');
             tickerAnchor.href = `/portfolio/${ticker}/`; 
             tickerAnchor.className = 'bg-white shadow rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 transform hover:scale-105';
@@ -272,7 +279,6 @@ function populateTickerData(data) {
             [logoImg, tickerSymbol, companyName, currentPrice, priceChange, percentChange].forEach(el => {
                 tickerAnchor.appendChild(el); 
             });
-
             container.appendChild(tickerAnchor);
         });
         }
@@ -358,3 +364,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     intervalID = setInterval(updateTickerDisplay, 60000);
 });
+

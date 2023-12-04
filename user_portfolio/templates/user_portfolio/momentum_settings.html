@@ -4,7 +4,7 @@
 {% block body %}
     <div class="w-full max-w-2xl mx-auto my-8 flex flex-col items-center text-center text-2xl">
         <div class="w-full mx-auto">
-            <p class="font-bold">Your current strategy parameters:</p>
+            <p class="font-bold text-center text-4xl pt-5">Your strategy parameters:</p>
             <p>You are searching for the top <span id="user-preferences-nlargest" class="font-bold">{{ user_preferences.nlargest_window }}</span> 
                 stock performance in the past <span id="user-preferences-window" class="font-bold">{{ user_preferences.window }}</span> 
                 months starting from 
@@ -15,7 +15,7 @@
         <!-- Strategy Form -->
     <div class="w-full max-w-4xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg text-2xl">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Custom Strategy Parameters</h2>
-        <form id="strategy-form" method="post" class="md:flex md:items-center md:justify-between md:gap-4">
+        <form id="strategy-form" method="post" class="text-center md:flex md:items-center md:justify-between md:gap-4">
             {% csrf_token %}
             <!-- date field -->
             <div class="mb-4 md:mb-0 w-full text-center">
@@ -55,7 +55,7 @@
         <!-- Strategy Form -->
     <div class="w-full max-w-4xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg text-2xl">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Optimize Your Strategy</h2>
-        <form id="optimisation-form" method="post" class="md:flex md:items-center md:justify-between md:gap-4">
+        <form id="optimisation-form" method="post" class="text-center md:flex md:items-center md:justify-between md:gap-4">
             {% csrf_token %}
             <!-- datefield field -->
             <div class="mb-4 md:mb-0 w-full text-center ">
@@ -94,40 +94,46 @@
             <span class="sr-only">Loading...</span>
         </div>
     </div>
-
-    <div id="linechart-wrapper" class="max-w-6xl max-h-1/2 mx-auto text-center">
-        <div id="chart-container" class="w-full mx-auto text-center mb-5">
-            <canvas id="myChart" class="w-full h-1/2" style="width:600px; height:400px;" wstyle="display: block;"></canvas>
+    <div id="linechart-wrapper" class="w-full mx-auto text-center max-w-4xl mb-10" style="display: none;">
+        <div id="chart-container" class="mx-auto">
+            <p class="font-bold text-center text-4xl pt-5">simulations of the Strategy's Monthly Returns:</p>
+            <canvas id="myChart" class="w-max-40"></canvas>
         </div>
     </div>
-    <div id="piechart-wrapper" class="w-full mx-auto text-center max-w-4xl">
+    <div id="piechart-wrapper" class="w-full mx-auto text-center max-w-4xl" style="display: none;>
         <div id="pie-chart-container" class="mx-auto">
-            <p class="text-xl font-bold text-center" id="stocks-date"></p>
+            <p class="font-bold text-center text-4xl pt-5" id="stocks-date"></p>
             <canvas id="myPieChart" class="w-max-40" style="display: block;"></canvas>
         </div>
-    </div>  
+    </div> 
 
-    <div id="ticker-display-container" class="container mx-auto px-4 mt-5"></div>
+    <p id = "live-price-paragraph" class="font-bold text-center text-4xl pt-5" style="display: none;">Live price change of the strategy stocks:</p>
+
+    <div id="ticker-display-container" class="container mx-auto px-4 mt-5">
+    </div>
      
 
 
 
-<script>
-    // Przekazanie danych Django do JavaScript
-    var defaultReturnsData = {{ chart_data | safe }};
-    var defaultPiechartsData = {{ equally_portfolio_data | safe }};
+    <script>
+        // Assuming Django template tags are properly set up to pass the data into JavaScript
+        var defaultReturnsData = {{ chart_data | safe }};
+        var defaultPiechartsData = {{ equally_portfolio_data | safe }};
+    
 
-    // Uruchomienie kodu po załadowaniu DOM
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicjalizacja wykresu z domyślnymi danymi
-        if (defaultReturnsData && defaultReturnsData.length > 0) {
-            updateChart(defaultReturnsData);
-            updatePieChart(defaultPiechartsData)
-        } else {
-            // Jeśli nie ma domyślnych danych, możesz zdecydować o pobraniu nowych danych
-            fetchChartData(''); // Możesz przekazać pusty ciąg jako domyślną datę
-        }
-    });
-</script>
-<script src="{% static 'user_portfolio/js/main.js' %}"></script>
-{% endblock %}
+    
+        // Run the code after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            if (defaultReturnsData && defaultReturnsData.length > 0) {
+                updateChart(defaultReturnsData);
+                updatePieChart(defaultPiechartsData);
+            } else {
+                fetchChartData(''); 
+            }
+            
+        });
+    
+        
+    </script>
+    <script src="{% static 'user_portfolio/js/main.js' %}"></script>
+    {% endblock %}

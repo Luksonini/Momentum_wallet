@@ -18,14 +18,23 @@ from .filters import MappedTickersFilter
 from django.db.models import Q
 import json
 from decimal import Decimal
+import yfinance as yf
 
 
 def index(request):
+    """
+    Renders the homepage of the investment application.
+    """
     return render(request, "user_portfolio/index.html")
 
 
 @login_required(login_url='login')
 def momentum(request):
+    """
+    Handles the momentum strategy page. It allows users to input investment 
+    preferences, view and optimize their investment strategies using historical 
+    market data.
+    """
     strategy_form = StrategyInputForm(request.POST or None)
     optimisation_form = OptimisationPreferencesForm(request.POST or None)
     user_strategy_model = UserStrategyModel.objects.filter(user=request.user).first()
@@ -36,7 +45,6 @@ def momentum(request):
 
     if user_strategy_model and user_strategy_model.returns_data:
         chart_data = user_strategy_model.returns_data
-        # equally_portfolio = EqualWeightedPortfolio(user_strategy_model.current_tickers, total_amount=user_preferences.balance)
         equally_portfolio = EqualWeightedPortfolio(total_amount=int(user_preferences.balance), tickers=user_strategy_model.current_tickers)
         equally_portfolio_data = equally_portfolio.get_chart_data()
 
@@ -50,6 +58,10 @@ def momentum(request):
 
 @login_required(login_url='login')
 def chart_data(request):
+    """
+    API view to fetch and return chart data based on user's strategy preferences.
+    The data includes performance comparison between user's strategy and US500 returns.
+    """
     start_date_str = request.GET.get('start_date', None)
     window = request.GET.get('window')
     nlargest_window = int(request.GET.get('nlargest'))
@@ -93,7 +105,10 @@ def chart_data(request):
 
 @login_required(login_url='login')
 def optimisation_view(request):
-    # Pobierz wartości z parametrów zapytania
+    """
+    View for optimizing investment strategy parameters. It updates user preferences 
+    and generates new chart data based on optimized parameters.
+    """
     optimisation_date = request.GET.get('optimisation_date')
     window = request.GET.get('window')
     nlargest_window = request.GET.get('nlargest_window') 
@@ -101,7 +116,6 @@ def optimisation_view(request):
     market_analysis = MarketAnalysis(start_date=optimisation_date)
     optimal_params = market_analysis.optimize_parameters(window_range=(1, int(window) + 1), nlargest_range=(5, int(nlargest_window) + 1))
 
-    # Zaktualizuj instancję optymalnymi parametrami
     new_window = int(optimal_params[0][0])
     new_nlargest_window = int(optimal_params[0][1])
 
@@ -115,17 +129,15 @@ def optimisation_view(request):
     market_analysis.nlargest_window = new_nlargest_window
     market_analysis.rolling_returns_large = market_analysis.calculate_rolling_returns(market_analysis.monthly_returns, market_analysis.window)
 
-    # Wywołaj metodę strategy_results dla optymalizowanej strategii
     results_json = market_analysis.strategy_results()
     tickers = market_analysis.get_current_month_tickers()
     print(tickers)
     equally_portfolio = EqualWeightedPortfolio(total_amount=int(user_preferences.balance), tickers=tickers)
     equally_portfolio_data = equally_portfolio.get_chart_data()
 
-    # data, created = 
     UserStrategyModel.objects.update_or_create(user=request.user, defaults={'returns_data': results_json, 'current_tickers': tickers})
     
-    # Dodaj nowe parametry do wyników
+
     response_data = {
         'results': results_json,
         'new_window': new_window,
@@ -137,7 +149,10 @@ def optimisation_view(request):
     return JsonResponse(response_data, encoder=DjangoJSONEncoder, safe=False)
 
 def tickers_info(request):
-    # Przykładowe dane - dostosuj je do swoich potrzeb
+    """
+    API view that provides information about tickers in user's strategy.
+    Returns data including current prices, price changes, and company details.
+    """
     user_strategy_model = UserStrategyModel.objects.filter(user=request.user).first()
     user_preferences = MarketAnalysisPreferences.objects.filter(user=request.user).first()
     tickers = user_strategy_model.current_tickers
@@ -151,6 +166,10 @@ def tickers_info(request):
 
 @login_required(login_url='login')
 def portfolio(request, ticker=''):
+    """
+    Portfolio management view. If a user's portfolio exists, it displays the portfolio.
+    Otherwise, it provides a form to create a new portfolio. Users can also delete their portfolio here.
+    """
     try:
         # Try to get the existing portfolio
         portfolio = Portfolio.objects.get(user=request.user)
@@ -204,6 +223,9 @@ def portfolio(request, ticker=''):
 
 
 def manage_watchlist(request):
+    """
+    API view for managing a user's watchlist. Allows adding and removing tickers from the watchlist.
+    """
     if request.method == 'POST':
         data = json.loads(request.body)
         action = data.get('action')
@@ -229,19 +251,27 @@ def manage_watchlist(request):
 
 
 def ticker_suggestions(request):
+    """
+    API view that provides auto-suggestions for ticker symbols based on user input.
+    Helps users in assembling their portfolio or curating their watchlist.
+    """
     query = request.GET.get('query', '')
     data = []
 
-    if query:  # Sprawdzanie, czy query nie jest pustym stringiem
+    if query:  
         suggestions = MappedTickers.objects.filter(
             Q(ticker__icontains=query) | Q(company_name__icontains=query)
-        )[:10]  # ograniczenie do 2 sugestii
+        )[:10]  
 
         data = [{'ticker': t.ticker, 'company_name': t.company_name} for t in suggestions]
 
     return JsonResponse(data, safe=False)
 
 def user_portfolio_api(request):
+    """
+    API view for managing user's portfolio. It allows adding and removing tickers 
+    from the portfolio and calculates portfolio performance.
+    """
     user_portfolio = UserPortfolio_utils(user=request.user)
 
     if request.method == 'GET':
@@ -270,8 +300,11 @@ def user_portfolio_api(request):
 
     return JsonResponse(response_data)
 
-import yfinance as yf
 def searching_ticker_value(request):
+    """
+    API view for fetching the current market value of a specific ticker symbol. 
+    Also provides the user's available cash for potential transactions.
+    """
     if request.method == 'GET':
         ticker = request.GET.get('ticker')
         if ticker:
@@ -290,6 +323,9 @@ def searching_ticker_value(request):
 
 
 def login_view(request):
+    """
+    View for handling user login. Authenticates users and directs them to the homepage upon successful login.
+    """
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -309,11 +345,17 @@ def login_view(request):
         return render(request, "user_portfolio/login.html")
 
 def logout_view(request):
+    """
+    Handles user logout and redirects to the login page.
+    """
     logout(request)
     return HttpResponseRedirect(reverse("login"))
 
 
 def register(request):
+    """
+    View for handling new user registrations. Validates user input and creates new user accounts.
+    """
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]

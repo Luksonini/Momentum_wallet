@@ -94,6 +94,8 @@ This Django-based investment application enables users to manage their investmen
 - **Responsive Investment Recommendations**: The application adapts its investment suggestions based on current market trends and user preferences.
   - **Code Reference**: Strategy generation methods in `MarketAnalysis`.
 
+## Video Walkthrough
+For a comprehensive walkthrough of the platform's features and functionalities, watch our detailed video on YouTube: [Investment Portfolio Application - Full Walkthrough](https://www.youtube.com/watch?v=KgnrLM2Jw0A&ab_channel=zimekpl1).
 ---
 
 ## API Key Configuration for Ticker Mapping
