@@ -25,7 +25,7 @@ class PortfolioEntryAdmin(admin.ModelAdmin):
 
 class PortfolioEntryInline(admin.TabularInline):
     model = PortfolioEntry
-    extra = 1  # Number of extra forms to display
+    extra = 1 
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):

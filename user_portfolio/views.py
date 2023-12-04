@@ -1,4 +1,3 @@
-# Django imports
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -16,7 +15,6 @@ from datetime import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from .filters import MappedTickersFilter
 from django.db.models import Q
-import json
 from decimal import Decimal
 import yfinance as yf
 

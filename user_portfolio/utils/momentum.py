@@ -110,11 +110,11 @@ class MarketAnalysis:
         ).cumsum().apply(np.exp)
 
         results_df['strategy'] = strategy_returns
-        results_df = results_df.dropna()  # Usuwa wiersze z jakimikolwiek wartościami NaN
+        results_df = results_df.dropna() 
 
         chart_data = [
             {
-                'date': index.strftime('%Y-%m-%d'),  # Zmiana formatu daty na string
+                'date': index.strftime('%Y-%m-%d'),  
                 'US500_returns': row['US500_returns'],
                 'strategy': row['strategy']
             }
@@ -123,7 +123,6 @@ class MarketAnalysis:
         
         return chart_data
 
-        # Nowa metoda do optymalizacji
     def optimize_parameters(self, window_range, nlargest_range, step=1):
         """
         Optymalizuje parametry window i nlargest_window.

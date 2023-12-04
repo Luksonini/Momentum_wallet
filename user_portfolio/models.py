@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 import pandas as pd
-# from django.core.serializers.json import DjangoJSONEncoder
 import datetime
 
 

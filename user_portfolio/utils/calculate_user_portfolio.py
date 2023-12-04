@@ -18,13 +18,11 @@ class UserPortfolio_utils:
     def fetch_current_prices(self):
         tickers = [entry.ticker_symbol for entry in self.entries]
 
-        # Jeśli lista tickerów jest pusta, zwróć pusty słownik
         if not tickers:
             return {}
 
         data = yf.download(tickers, period="1d")['Close'].iloc[-1]
 
-        # Kontynuuj z resztą logiki, jak wcześniej opisano
         if isinstance(data, (float, np.float64)):
             return {tickers[0]: data}
         else:
@@ -52,7 +50,7 @@ class UserPortfolio_utils:
             company_name = mapped_ticker.company_name  # Use the correct attribute for company name
             logo = mapped_ticker.logo_url  # Get the logo URL
             purchase_price = entry.purchase_price
-            current_price = Decimal(current_prices.get(ticker, 0))  # Convert to Decimal
+            current_price = Decimal(current_prices.get(ticker, 0))  
             quantity = entry.quantity
             value = quantity * current_price  # Now both are Decimal
             price_change = current_price - purchase_price
@@ -80,37 +78,30 @@ class UserPortfolio_utils:
     
 
     def add_ticker_to_portfolio(self, ticker_symbol, purchase_price, quantity):
-        # Sprawdź, czy ticker już istnieje w portfelu
         existing_entry = self.entries.filter(ticker_symbol=ticker_symbol).first()
 
         if existing_entry:
-            # Aktualizuj istniejący wpis
             existing_entry.purchase_price = (existing_entry.purchase_price * existing_entry.quantity + purchase_price * quantity) / (existing_entry.quantity + quantity)
             existing_entry.quantity += quantity
             existing_entry.save()
         else:
-            # Dodaj nowy wpis
             new_entry = PortfolioEntry(
                 portfolio=self.portfolio,
                 ticker_symbol=ticker_symbol,
-                purchase_date=timezone.now(),  # Używamy bieżącej daty jako daty zakupu
+                purchase_date=timezone.now(), 
                 purchase_price=purchase_price,
                 quantity=quantity
             )
             new_entry.save()
 
-        # Aktualizuj dostępną gotówkę
         self.portfolio.available_cash -= purchase_price * quantity
         self.portfolio.save()
 
     def remove_ticker_from_portfolio(self, ticker_symbol, current_price):
-        # Znajdź wpis z podanym tickerem
         entry_to_remove = self.entries.filter(ticker_symbol=ticker_symbol).first()
 
         if entry_to_remove:
-            # Zwróć pieniądze do dostępnej gotówki
             self.portfolio.available_cash += current_price * entry_to_remove.quantity
             self.portfolio.save()
             
-            # Usuń wpis
             entry_to_remove.delete()
