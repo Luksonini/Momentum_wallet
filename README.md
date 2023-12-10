@@ -147,6 +147,7 @@ The screenshot illustrates the Portfolio Management interface of the Capybara In
 <div align="center">
   <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/333e2acf-8b30-4c57-aeca-1203094d25ee" alt="Portfolio Management Interface" width="100%"/>
 </div>
+
 # Technical Description of Functions
 
 ### `index`:
