@@ -1,122 +1,72 @@
-# Investment Portfolio Application
+## Introduction
+Welcome to the Capybara Investments Platform, an advanced web-based application designed to revolutionize personal investment management. At the intersection of finance and technology, this platform delivers a seamless integration of market analytics, strategy optimization, and real-time portfolio management, all through a user-centric interface.
+In a financial landscape where decision-making is paramount, our platform stands as a beacon of innovation, providing users with a sophisticated toolkit designed to tailor investment strategies to individual financial goals and market conditions. By leveraging cutting-edge technologies and complex algorithms, the Capybara Investments Platform offers a unique solution that empowers users to navigate the markets with confidence and precision.
+From the meticulous implementation of Django's robust backend functionalities to the dynamic and responsive front-end design, every aspect of this platform has been crafted with the utmost attention to detail. This ensures not only the reliability and security expected of a modern financial application but also an engaging and intuitive user experience.
 
-## User Registration Screen
+## Distinctiveness and Complexity
 
-Below is the user registration screen of the Capybara Investments platform. This is the first step for new users to create an account, granting access to personalized investment strategy tools and portfolio management. The design emphasizes clarity and ease of use, inviting users to join the Capybara community.
+The Capybara Investments Platform stands out in its comprehensive approach to personal investment management. Unlike standard investment tools that offer generic advice, this platform harnesses the power of historical market data analysis combined with real-time stock updates to provide tailored strategy optimization. The integration of `scipy.optimize` enables the application to not just present data but to process it in a way that directly influences the users' decision-making processes with actionable insights.
+Moreover, the project goes beyond the capabilities of typical e-commerce or social network projects by providing dynamic portfolio adjustment tools, real-time stock price monitoring through `yfinance`, and interactive data visualizations with `matplotlib`. The platform's responsiveness to market trends and user preferences makes it uniquely adaptive, providing investment recommendations that evolve with the market.
+Each component of the project, from the backend Django models to the frontend JavaScript interactions, has been carefully crafted to ensure a seamless and secure user experience. The project's complexity is also evident in the detailed transaction tracking system, which not only records user activities but also provides analytical insights, thus serving as a crucial tool for financial planning and strategy assessment.
+The platform's mobile responsiveness ensures that the sophisticated tools and data visualizations are accessible across all devices, catering to the modern investor's need for on-the-go financial management. This responsiveness is not just about visual layout but also about the functional adaptability of the platform's features, which maintain their integrity and usefulness regardless of the device.
+Furthermore, the Capybara Investments Platform employs `chart.js` for graphical representations, fetching real-time data every minute from `yfinance` to update stock price changes in the user-created portfolio. This illustrates the platform's commitment to providing up-to-date financial information, fostering informed investment decisions.
+In addition to real-time data updates, the project utilizes two other APIs: `API Ninjas` and `Polygon.io` to create a mapping API that correlates ticker symbols to full company names and logos. This mapping is crucial for the platform's functionality, displaying accurate and recognizable information to the user. 
+Another cornerstone of the project is the implementation of `TradingView charts`. This integration provides on-demand, interactive charting capabilities, allowing users to visualize the stock performance for any listed company by simply clicking on the company's name, further enhancing the user experience.
+The platform leverages the momentum strategy, a sophisticated investment approach that capitalizes on trends by identifying companies with the highest returns over a specified number of months. On the optimization page, users can customize their preferred values for the number of months to analyze and the number of top-performing stocks to display, along with the starting year for the simulation. The output includes both the list of companies and a `chart.js` line chart that compares the strategy's performance to the benchmark US500 index over the same historical period.
+Additionally, an optimization form can be executed to determine the optimal number of months for the highest returns and the ideal number of stocks to be displayed. This optimization process is a testament to the platform's advanced analytical capabilities.
+The project also features a `Piechart.js` functionality that calculates the number of shares to purchase for each company, aiming to allocate equal capital to each to achieve an equally weighted portfolio with minimal cash leftovers. This algorithmic distribution showcases the application's strategic planning features.
+It is also worth noting that the project is predominantly API and AJAX driven, ensuring asynchronicity and a seamless user experience without the need for page reloads. This approach underscores the modern web development practices employed in creating a dynamic, responsive, and user-friendly investment platform.
+In essence, the Capybara Investments Platform not only provides a robust tool for personal investment management but also serves as a model for cutting-edge web application development in the financial domain.
+In summary, the Capybara Investments Platform is distinguished by its:
+- Advanced algorithmic analysis and optimization of investment strategies.
+- Real-time monitoring and visualization of stock data for informed decision-making.
+- A robust and secure full-stack Django application that supports intricate user interactions and data management.
+The project’s commitment to combining sophisticated financial analysis with user-centric design makes it a novel contribution to the field of financial web applications.
+## File Structure and Contents
 
-<div align="center">
-  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/f9c47241-d8f7-4146-81d3-17f61463d98f" alt="User Registration Screen" width="100%"/>
-</div>
+- `market_portfolio/`: Main Django project directory containing settings and root URL configurations.
+- `user_portfolio/`: Main application directory housing the core functionality of the investment platform.
 
-## Main Dashboard
+  - `management/commands/`: Contains custom Django management commands.
+    - `maptickers.py`: This command maps ticker symbols to full company names and logos, populating the `MappedTickers` model with this data for later use on the platform.
 
-The screenshot below showcases the main dashboard of the Capybara Investments platform. It's designed to welcome users with an intuitive layout, providing quick access to essential features like 'Momentum' and 'Portfolio'. The vibrant illustration emphasizes our commitment to helping users build a stronger financial future with accessible high-quality investment advice.
+  - `migrations/`: Django database migration files.
 
-<div align="center">
-  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/136f334b-2f87-4d40-9eee-ac944f623664" alt="Main Dashboard" width="100%"/>
-</div>
+  - `static/user_portfolio/`: Static files for the application.
+    - `images/`: Image assets used across the platform.
+    - `js/`: JavaScript files.
+      - `main.js`: Provides styling and functionality for the strategy and portfolio parameters page.
+      - `portfolio.js`: Styles the TradingView charts and user portfolio page.
+    - `index.css`: The main stylesheet for the application.
 
-## Momentum Strategy Optimization
+  - `templates/user_portfolio/`: Django HTML templates for rendering views.
+    - `index.html`: The landing page template.
+    - `login.html`, `register.html`, etc.: Templates for user authentication.
 
-The image below displays the Momentum Optimization page of the Capybara Investments platform, where users can fine-tune their investment strategies. This page allows users to set and adjust parameters such as the evaluation window, the number of top-performing stocks to consider, and the available capital for investment. The interactive graph provides a visual representation of the strategy's performance against the US500 returns, offering an intuitive way to compare and optimize investment strategies for better decision-making.
+  - `utils/`: Utility functions and classes for strategy calculations and portfolio management.
+    - `momentum.py`: Contains classes necessary for calculating the momentum strategy and optimization parameters.
+    - `calculate_weights.py`: Houses the `EqualWeightedPortfolio` class for calculating optimal share quantity for each stock returned by the strategy.
+    - `calculate_user_portfolio.py`: Contains helper class for managing cash flow during stock transactions and updating the `PortfolioEntry` model.
 
-<div align="center">
-  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/a7eecadd-731d-4a2b-844c-b3684726b0f1" alt="Momentum Strategy Optimization" width="100%"/>
-</div>
+  - `admin.py`: Configuration for the Django admin interface for our models.
+  - `filters.py`: Utilizes `django_filters` for searching tickers in the `MappedTickers` model.
+  - `forms.py`: Forms used throughout the project for strategy input, optimization preferences, and portfolio creation.
+  - `models.py`: Django models including `User`, `MarketAnalysisPreferences`, `Portfolio`, `PortfolioEntry`, `MappedTickers`, and `Watchlist`.
+  - `views.py`: Django views for rendering pages and handling backend logic.
+  - `urls.py`: URL configurations for the application routes.
 
-## Portfolio Management Interface
+- `db.sqlite3`: The SQLite database file.
+- `manage.py`: A command-line utility for administrative tasks.
 
-The screenshot illustrates the Portfolio Management interface of the Capybara Investments platform, a central feature where users can view and manage their individual stock holdings. The page presents a detailed table with information on company holdings, quantities, purchase prices, current values, and performance indicators such as price and percentage changes. Actions such as selling stocks can be performed directly from this interface. Above the table, an interactive stock chart for a selected company, such as Apple Inc. in this instance, shows historical price data, allowing users to visualize stock performance over time.
+- `README.md`: The project documentation file.
+- `requirements.txt`: A list of Python packages to be installed for the project.
+## Installation and Setup
 
-<div align="center">
-  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/333e2acf-8b30-4c57-aeca-1203094d25ee" alt="Portfolio Management Interface" width="100%"/>
-</div>
+[... Detailed instructions on how to install and run the application ...]
 
-## Overview
+## Additional Python Packages
 
-This Django-based investment application enables users to manage their investment strategies and portfolio with ease. It provides robust market analysis, strategy optimization, and portfolio management features. Users can personalize their investment strategies, track market performance, and stay informed with real-time ticker suggestions.
-
-## Key Features
-
-
-### Market Analysis and Strategy Optimization
-
-- **Historical Market Data Analysis (`MarketAnalysis` class)**: Utilizes historical market data to generate actionable portfolio suggestions. This class leverages the `scipy.optimize` algorithm for optimizing strategy parameters, enhancing investment returns.
-  - **Code Reference**: `MarketAnalysis` in `market_analysis.py`.
-
-### Advanced Portfolio Management
-
-- **Dynamic Portfolio Adjustment (`EqualWeightedPortfolio` class)**: Enables users to dynamically adjust their portfolio's weight distribution. It integrates `yfinance` for real-time stock price monitoring and utilizes interactive `matplotlib` charts for strategy performance insights.
-  - **Code Reference**: `EqualWeightedPortfolio` in `portfolio_management.py`.
-
-### User Interaction and Insights
-
-- **Interactive Data Visualization**: Provides users with interactive charts and data, using `matplotlib` to offer insights into strategy performance compared to benchmarks like the S&P 500 index.
-  - **Code Reference**: `plot_performance` method in `MarketAnalysis` class.
-
-### User Portfolio API
-
-- **Detailed Portfolio Management (`UserPortfolio_utils` class)**: Allows for in-depth management of a user's portfolio, including adding and removing stocks, and calculating portfolio performance.
-  - **Code Reference**: `UserPortfolio_utils` in `user_portfolio_utils.py`.
-
-### Watchlist Management
-
-- **Personalized Watchlist (`manage_watchlist` API)**: This feature enables users to add and remove tickers from their watchlist, tailoring their investment focus.
-  - **Code Reference**: `manage_watchlist` in `views.py`.
-
-### Ticker Suggestions
-
-- **Auto-Suggestions for Tickers (`ticker_suggestions` API)**: Offers real-time ticker symbol suggestions to aid users in assembling their portfolio or curating their watchlist.
-  - **Code Reference**: `ticker_suggestions` in `views.py`.
-
-### Security and User Authentication
-
-- **Secure User Sessions**: The application ensures user security, particularly for handling sensitive financial data, through Django's secure authentication mechanisms for login, logout, and user registration.
-  - **Code Reference**: `login_view`, `logout_view`, `register` in `views.py`.
-
-### Date Range Customization in Analysis
-
-- **Flexible Date Analysis (`StockData` class)**: Users can customize the date range for market analyses, supported by the `StockData` class's flexible date handling.
-  - **Code Reference**: `StockData` in `stock_data.py`.
-
-### Automated Ticker Updates
-
-- **Real-time Ticker Information Updates**: The application automatically updates ticker information from Wikipedia, ensuring up-to-date S&P 500 company details.
-  - **Code Reference**: `_fetch_tickers` method in `StockData` class.
-
-### Portfolio Transaction History
-
-- **Detailed Transaction Tracking (`UserPortfolio_utils` class)**: Users can track their portfolio transaction history and changes, facilitated by the detailed tracking in `UserPortfolio_utils`.
-  - **Code Reference**: `add_ticker_to_portfolio`, `remove_ticker_from_portfolio` in `UserPortfolio_utils`.
-
-### Adaptive Investment Suggestions
-
-- **Responsive Investment Recommendations**: The application adapts its investment suggestions based on current market trends and user preferences.
-  - **Code Reference**: Strategy generation methods in `MarketAnalysis`.
-
-## Video Walkthrough
-For a comprehensive walkthrough of the platform's features and functionalities, watch our detailed video on YouTube: [Investment Portfolio Application - Full Walkthrough](https://www.youtube.com/watch?v=KgnrLM2Jw0A&ab_channel=zimekpl1).
----
-
-## API Key Configuration for Ticker Mapping
-
-### Using External APIs for Ticker Information
-
-The `maptickers` command in this application relies on external APIs from `https://api-ninjas.com/` and `https://polygon.io/stocks` to fetch and map ticker information accurately. To ensure the command functions correctly, you need to use your own API keys for these services.
-
-### Obtaining API Keys
-
-- **API-Ninjas**: Visit [API-Ninjas](https://api-ninjas.com/) and sign up to obtain a free API key. Note that the free tier has request limitations.
-- **Polygon.io**: Go to [Polygon.io](https://polygon.io/stocks) and register for an API key. They also offer a free tier with certain usage restrictions.
-
-### Configuring Your Application
-
-1. After obtaining the API keys, open your application's `settings.py` file.
-2. Add the following configuration parameters:
-
-   ```python
-   API_NINJAS_KEY = 'your_api-ninjas_key_here'
-   POLYGON_IO_KEY = 'your_polygon.io_key_here'
+The following packages are required and listed in `requirements.txt`:
 
 ## Installation
 
@@ -158,12 +108,37 @@ To ensure the application's functionality, execute the `maptickers` command befo
 ## Getting Started
 
 After installation, navigate to the main page to start customizing your investment strategy. Use the form to enter your preferences and let the application generate a strategy for you. Explore different sections to optimize your strategy, manage your portfolio, and stay updated with the latest market trends.
+## User Registration Screen
 
-## Contribution
+Below is the user registration screen of the Capybara Investments platform. This is the first step for new users to create an account, granting access to personalized investment strategy tools and portfolio management. The design emphasizes clarity and ease of use, inviting users to join the Capybara community.
 
-Your contributions are welcome! Please fork the repository and submit a pull request with your proposed changes.
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/f9c47241-d8f7-4146-81d3-17f61463d98f" alt="User Registration Screen" width="100%"/>
+</div>
 
+## Main Dashboard
 
+The screenshot below showcases the main dashboard of the Capybara Investments platform. It's designed to welcome users with an intuitive layout, providing quick access to essential features like 'Momentum' and 'Portfolio'. The vibrant illustration emphasizes our commitment to helping users build a stronger financial future with accessible high-quality investment advice.
+
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/136f334b-2f87-4d40-9eee-ac944f623664" alt="Main Dashboard" width="100%"/>
+</div>
+
+## Momentum Strategy Optimization
+
+The image below displays the Momentum Optimization page of the Capybara Investments platform, where users can fine-tune their investment strategies. This page allows users to set and adjust parameters such as the evaluation window, the number of top-performing stocks to consider, and the available capital for investment. The interactive graph provides a visual representation of the strategy's performance against the US500 returns, offering an intuitive way to compare and optimize investment strategies for better decision-making.
+
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/a7eecadd-731d-4a2b-844c-b3684726b0f1" alt="Momentum Strategy Optimization" width="100%"/>
+</div>
+
+## Portfolio Management Interface
+
+The screenshot illustrates the Portfolio Management interface of the Capybara Investments platform, a central feature where users can view and manage their individual stock holdings. The page presents a detailed table with information on company holdings, quantities, purchase prices, current values, and performance indicators such as price and percentage changes. Actions such as selling stocks can be performed directly from this interface. Above the table, an interactive stock chart for a selected company, such as Apple Inc. in this instance, shows historical price data, allowing users to visualize stock performance over time.
+
+<div align="center">
+  <img src="https://github.com/Luksonini/Momentum_wallet/assets/97095836/333e2acf-8b30-4c57-aeca-1203094d25ee" alt="Portfolio Management Interface" width="100%"/>
+</div>
 # Technical Description of Functions
 
 ### `index`:
@@ -224,8 +199,6 @@ Your contributions are welcome! Please fork the repository and submit a pull req
 
 - A helper class for fetching and processing stock market data for market analysis.
 
-
-
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License. 
