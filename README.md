@@ -1,3 +1,6 @@
+# Capybara Invertments (market portfolio online)
+![image](https://github.com/Luksonini/Momentum_wallet/assets/97095836/8b02de92-f06f-487d-8185-ebfa9c1f8e8c)
+
 ## Introduction
 Welcome to the Capybara Investments Platform, an advanced web-based application designed to revolutionize personal investment management. At the intersection of finance and technology, this platform delivers a seamless integration of market analytics, strategy optimization, and real-time portfolio management, all through a user-centric interface.
 In a financial landscape where decision-making is paramount, our platform stands as a beacon of innovation, providing users with a sophisticated toolkit designed to tailor investment strategies to individual financial goals and market conditions. By leveraging cutting-edge technologies and complex algorithms, the Capybara Investments Platform offers a unique solution that empowers users to navigate the markets with confidence and precision.
